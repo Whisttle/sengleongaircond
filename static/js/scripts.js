@@ -115,6 +115,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const slidesContainer = carousel.querySelector('.brand-slides');
     const slides = Array.from(carousel.querySelectorAll('.brand-slide'));
     const dotsContainer = carousel.querySelector('.brand-dots');
+    const leftArrow = carousel.querySelector('.brand-arrow-left');
+    const rightArrow = carousel.querySelector('.brand-arrow-right');
     let current = 0;
     let intervalId = null;
 
@@ -135,15 +137,34 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function updateArrowStates() {
+        leftArrow.style.opacity = current === 0 ? '0.5' : '1';
+        rightArrow.style.opacity = current === slides.length - 1 ? '0.5' : '1';
+        leftArrow.style.pointerEvents = current === 0 ? 'none' : 'auto';
+        rightArrow.style.pointerEvents = current === slides.length - 1 ? 'none' : 'auto';
+    }
+
     function goToSlide(idx) {
         current = idx;
         slidesContainer.style.transform = `translateX(-${idx * 100}%)`;
         updateDots(idx);
+        updateArrowStates();
     }
 
     function nextSlide() {
-        current = (current + 1) % slides.length;
-        goToSlide(current);
+        if (current < slides.length - 1) {
+            goToSlide(current + 1);
+        } else {
+            goToSlide(0); // Loop back to first slide
+        }
+    }
+
+    function prevSlide() {
+        if (current > 0) {
+            goToSlide(current - 1);
+        } else {
+            goToSlide(slides.length - 1); // Loop to last slide
+        }
     }
 
     function resetInterval() {
@@ -151,6 +172,19 @@ document.addEventListener('DOMContentLoaded', function () {
         intervalId = setInterval(nextSlide, 5000);
     }
 
+    // Event listeners for arrows
+    if (leftArrow) leftArrow.addEventListener('click', () => {
+        prevSlide();
+        resetInterval();
+    });
+    
+    if (rightArrow) rightArrow.addEventListener('click', () => {
+        nextSlide();
+        resetInterval();
+    });
+
+    // Initialize
+    goToSlide(0);
     resetInterval();
 
     // Pause on hover

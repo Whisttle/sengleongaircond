@@ -371,11 +371,43 @@ body {
     position: relative;
     width: 100%;
     max-width: 100%;
-    overflow: hidden;
     background: var(--white);
     border-radius: 16px;
+    padding-bottom: 10px;
     box-shadow: var(--shadow-light);
 }
+
+.brand-arrow {
+    position: absolute;
+    z-index: 99999;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--bright-cyan);
+    color: var(--white);
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem; 
+    overflow: visible;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-medium);
+}
+
+.brand-arrow:hover {
+    background: var(--primary-navy);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.brand-arrow-left {
+    left: -25px;
+}
+
+.brand-arrow-right {
+    right: -25px;
+}
+
 .brand-slides {
     width: 100%;
     max-width: 100%;
@@ -386,7 +418,7 @@ body {
 }
 .brand-slide {
     min-width: 100%;
-    width: 100vw;
+    width: 100%;
     height: 70vh;
     display: flex;
     flex-direction: column;
@@ -420,11 +452,26 @@ body {
 }
 @media (max-width: 600px) {
     .brand-slide {
-        height: 40vh;
+        height: 180px;
+    }
+    .brand-slide img {
+        max-width: 90vw;
+        max-height: 100px;
     }
     .brand-caption {
         font-size: 1rem;
         padding: 0.3rem 1rem;
+    }
+    .brand-arrow {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    .brand-arrow-left {
+        left: -15px;
+    }
+    .brand-arrow-right {
+        right: -15px;
     }
 }
 
