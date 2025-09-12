@@ -104,9 +104,15 @@ body {
     cursor: pointer;
 }
 
+@media screen {
+    
+}
 /* Hero Section */
 .hero {
-    background: linear-gradient(135deg, var(--primary-navy) 0%, var(--dark-navy-hover) 100%);
+    background: linear-gradient(135deg, rgba(10, 31, 68, 0.8) 0%, rgba(30, 58, 138, 0.8) 100%), url('../images/acImage.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
     color: var(--white);
     padding: 8rem 2rem 6rem;
     position: relative;
@@ -146,6 +152,7 @@ body {
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: 1.5rem;
+    color: var(--white);
 }
 
 .hero-subtitle {
