@@ -118,24 +118,30 @@
 </head>
 <body>
     <!-- Header & Navigation -->
-    <header class="header" id="header">
-        <div class="nav-container">
-            <a href="#home" class="logo" style="display: flex; align-items: center; gap: 10px;">
-                <img src="static/images/SL_HD_logo.jpg" alt="Seng Leong Engineering Air Conditioning Services Logo" style="width: 50px; height: 50px;">
-                <span> Seng Leong Engineering Sdn Bhd</span>
+    <header>
+        <nav class="nav-container">
+            <a href="index.html" class="logo" style="display:inline-block; max-width:100%;">
+                <span style="display: flex; align-items: center; gap: 8px; max-width: 100%; width: 100%;">
+                    <img src="static/images/SL_HD_logo.jpg" alt="logo-icon" class="logo-icon" >
+                    <span class="company-name" >Seng Leong Engineering Sdn Bhd</span>
+                </span>
             </a>
-            <nav>
-                <ul class="nav-menu" id="nav-menu">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="nav-wrapper">
+                <ul class="nav-links">
                     <li><a href="#home" class="nav-link">Home</a></li>
                     <li><a href="#services" class="nav-link">Services</a></li>
+                    <li><a href="#partners" class="nav-link">Our Partner</a></li>
                     <li><a href="#testimonials" class="nav-link">Reviews</a></li>
                     <li><a href="#contact" class="nav-link">Contact</a></li>
+                    
                 </ul>
-                <button class="mobile-toggle" id="mobile-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
+            </div>
             </nav>
-        </div>
     </header>
 
     <!-- Hero Section -->
@@ -146,17 +152,16 @@
                 <!-- <p class="hero-subtitle">Servicing Selangor & Kuala Lumpur - 7 Days a Week</p> -->
                 <p class="hero-description">We are a certified air conditioning supplier with over 20 years of proven experience. Trusted by residential and commercial clients across Klang Valley area. We offer the lowest pricing without compromising on quality and provide brand-certified systems from all top air conditioner brands. Our solutions guarantee reliability, energy efficiency and long-term value.</p>
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-                    <i class="fab fa-google" style="color: var(--yellow-highlight);"></i>
-                    <span style="color: var(--yellow-highlight); font-weight: 600; font-size: x-large;" itemscope itemtype="https://schema.org/AggregateRating">
-                        <span itemprop="ratingValue">4.8</span> ⭐⭐⭐⭐⭐
-                    </span>
-                    <span style="opacity: 0.8;" itemprop="reviewCount">71 reviews</span>
+                    <!-- Elfsight Google Reviews | Untitled Google Reviews -->
+                    <script src="https://elfsightcdn.com/platform.js" async></script>
+                    <div class="elfsight-app-f1c7e6c9-ea1c-4ef4-8946-ec89aa8d9b84" data-elfsight-app-lazy></div>
+                    
                 </div>
             </div>
             <div class="hero-form">
                 <h3 class="form-title">Get Free Air Conditioning Quote</h3>
                 <p class="form-subtitle">Contact us today for professional air conditioning supply in Klang Valley</p>
-                <form id="quote-form" itemscope itemtype="https://schema.org/ContactPoint">
+                <form id="quote-form" itemscope itemtype="https://schema.org/ContactPoint" action="https://formsubmit.co/karimazizc@gmail.com" method="POST">
                     <div class="form-row">
                         <div class="form-group form-half">
                             <input type="text" class="form-input" name="name" placeholder="Name" required>
@@ -175,7 +180,7 @@
                         <input type="text" class="form-input" name="location" placeholder="Location Area (e.g. Klang, PJ, KL)" required>
                     </div>
                     <div class="form-group">
-                        <textarea class="form-input" name="comment" placeholder="Comment (optional)" rows="3"></textarea>
+                        <textarea class="form-input" name="comment" placeholder="Comment (optional)" rows="3" ></textarea>
                     </div>
                     <button type="submit" class="cta-button">Get Free Quote Now</button>
                 </form>
@@ -286,7 +291,7 @@
     </section>
 
     <!-- Partners Section -->
-    <section class="partners-section">
+    <section class="partners-section" id ='partners'>
         <h2 class="section-title">Authorized Air Conditioning Brand Partners</h2>
         <p class="section-subtitle">Official dealer for leading air conditioning brands in Malaysia</p>
         <div class="brand-carousel">
@@ -296,12 +301,15 @@
             
             <div class="brand-slides">
                 <img src="static/images/SL Aircond Horizontal Poster.jpg" alt="Seng Leong Engineering Air Conditioning Services" class="brand-slide" />
-                <img src="static/images/Midea.webp" alt="Midea Air Conditioning Brand Partner" class="brand-slide" />
-                <img src="static/images/Daikin.webp" alt="Daikin Air Conditioning Authorized Dealer" class="brand-slide" />
-                <img src="static/images/Panasonic.webp" alt="Panasonic Air Conditioning Official Partner" class="brand-slide" />
+                <img src="static/images/Midea.png" alt="Midea Air Conditioning Brand Partner" class="brand-slide" />
+                <img src="static/images/Daikin.png" alt="Daikin Air Conditioning Authorized Dealer" class="brand-slide" />
+                <img src="static/images/Panasonic.png" alt="Panasonic Air Conditioning Official Partner" class="brand-slide" />
                 <img src="static/images/haier.webp" alt="Haier Air Conditioning Brand Partner" class="brand-slide" />
-                <img src="static/images/mitsubishi.webp" alt="Mitsubishi Air Conditioning Authorized Dealer" class="brand-slide" />
-                <img src="static/images/outlet picture.jpg" alt="Seng Leong Engineering Air Conditioning Outlet" class="brand-slide" />
+                <img src="static/images/Mitsubishi.png" alt="Mitsubishi Air Conditioning Authorized Dealer" class="brand-slide" />
+                <img src="static/images/Acson.png" alt="Acson Air Conditioning Authorized Dealer" class="brand-slide" />
+                <img src="static/images/AUX.png" alt="AUX Air Conditioning Authorized Dealer" class="brand-slide" />
+                <img src="static/images/TCL.png" alt="TCL Air Conditioning Authorized Dealer" class="brand-slide" />
+                <img src="static/images/putlet.jpg" alt="Seng Leong Engineering Air Conditioning Outlet" class="brand-slide" />
                 <!-- Add more slides as needed -->
             </div>
             
@@ -321,7 +329,7 @@
             <p class="section-subtitle">Real feedback from satisfied customers across Klang Valley, Selangor, and Kuala Lumpur</p>
             
             <div class="testimonials-carousel">
-                <button class="testimonial-arrow testimonial-arrow-left" type="button">
+                <!-- <button class="testimonial-arrow testimonial-arrow-left" type="button">
                     <i class="fas fa-chevron-left"></i>
                 </button>
                 
@@ -329,24 +337,28 @@
                     <div class="testimonials-grid">
                         <div class="testimonial-card">
                             <i class="fas fa-quote-right quote-icon"></i>
-                            <p class="testimonial-text">"Booking was easy, and the service was excellent. Their technician identified the problem immediately and had spare parts on hand. My team is back in a cool, comfortable workspace thanks to them."</p>
+                            <p class="testimonial-text">"Found thru shopee. But shop at the store physically. Bought Midea 1.0HP Inverter 5.0 ⭐️. Use it for my Master bedroom and it works like wonder eventhough I set it only at 24 degree. The best price I get from the owner herself. Owner very pretty helpful and kind. I totally recommended this shop!."</p>
                             <div class="testimonial-author">
                                 <div class="author-avatar">ZH</div>
                                 <div class="author-info">
-                                    <h4>Zulkifli Hassan</h4>
-                                    <p>Office Administrator</p>
+                                    <h4>Muhammad Fadhil Mohd Azhar</h4>
+                                    <p>Google Reviewer</p>
+                                    <span itemprop="ratingValue">5</span> ⭐⭐⭐⭐⭐
                                 </div>
+                               
                             </div>
+            
                         </div>
 
                         <div class="testimonial-card">
                             <i class="fas fa-quote-right quote-icon"></i>
-                            <p class="testimonial-text">"Our kids can't be in a hot room, so when the aircond failed, we were in panic mode. These guys came fast and had my unit running in no time. Honest pricing too. Highly recommended!"</p>
+                            <p class="testimonial-text">"Good product quality, fast service and staff very friendly and helpful. I highly recommend this seller."</p>
                             <div class="testimonial-author">
                                 <div class="author-avatar">AR</div>
                                 <div class="author-info">
-                                    <h4>Anita Raj</h4>
-                                    <p>Daycare Owner</p>
+                                    <h4>Norizal Ahmad</h4>
+                                    <p>Google Reviewer</p>
+                                    <span itemprop="ratingValue">5</span> ⭐⭐⭐⭐⭐
                                 </div>
                             </div>
                         </div>
@@ -357,15 +369,17 @@
                             <div class="testimonial-author">
                                 <div class="author-avatar">AF</div>
                                 <div class="author-info">
-                                    <h4>Ahmad Firdaus</h4>
-                                    <p>Restaurant Owner</p>
+                                    <h4>Daniel Daraup</h4>
+                                    <p>Google Reviewer</p>
                                 </div>
                             </div>
                         </div>
 
                         <div class="testimonial-card">
                             <i class="fas fa-quote-right quote-icon"></i>
-                            <p class="testimonial-text">"The team was professional and transparent throughout the process. My old aircond now works like new again. They explained everything clearly and left no mess behind. Great service and very courteous!"</p>
+                            <p class="testimonial-text">"I recently purchased and installed an air conditioner through Seng Leong Engineering, and I couldn’t be happier with the service. They offer some of the best prices in the Klang Valley, and what’s even better — the price includes installation, with no hidden charges.
+
+Their team was punctual, professional, and efficient, completing the job with excellent workmanship. The installation was clean and tidy, and everything was done exactly as promised. You can tell they take pride in their work and prioritize customer satisfaction."</p>
                             <div class="testimonial-author">
                                 <div class="author-avatar">NH</div>
                                 <div class="author-info">
@@ -399,13 +413,18 @@
                             </div>
                         </div>
                     </div>
+
+              
                 </div>
-                
+                  
                 <button class="testimonial-arrow testimonial-arrow-right" type="button">
                     <i class="fas fa-chevron-right"></i>
                 </button>
                 
-                <div class="testimonial-dots"></div>
+                <div class="testimonial-dots"></div> -->
+                      <!-- Elfsight Google Reviews | Untitled Google Reviews -->
+                <script src="https://elfsightcdn.com/platform.js" async></script>
+                <div class="elfsight-app-953cfb60-2f8f-445b-92f9-9380097ebe47" data-elfsight-app-lazy></div>
 
                 <div class="cta-section" style="width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 2rem;">
                     <a href="#home" style="width: 30%;"><button class="cta-button"style="border-radius: 16px !important;">Get Quote</button></a>
@@ -452,6 +471,6 @@
 
 
     <script src="static/js/scripts.js"></script>
-  
+    <script src="static/js/header.js"></script>
 </body>
 </html>

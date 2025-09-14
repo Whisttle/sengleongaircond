@@ -249,7 +249,8 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('scroll', triggerAnimations);
     triggerAnimations(); // In case already in view
 });
-  // Mobile Menu Toggle
+  
+// Mobile Menu Toggle
 const mobileToggle = document.getElementById('mobile-toggle');
 const navMenu = document.getElementById('nav-menu');
 
