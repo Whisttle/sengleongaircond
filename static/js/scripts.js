@@ -444,39 +444,5 @@ window.addEventListener('scroll', () => {
     scrollProgress.style.width = scrolled + '%';
 });
 
-// Add WhatsApp floating button
-const whatsappButton = document.createElement('a');
-whatsappButton.href = 'https://wa.me/60122992909?text=Hi, I would like to get a quote for air conditioning service';
-whatsappButton.target = '_blank';
-whatsappButton.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    background: #25D366;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.5rem;
-    text-decoration: none;
-    box-shadow: var(--shadow-large);
-    z-index: 1000;
-    transition: all 0.3s ease;
-`;
-whatsappButton.innerHTML = '<i class="fab fa-whatsapp"></i>';
 
-whatsappButton.addEventListener('mouseenter', () => {
-    whatsappButton.style.transform = 'scale(1.1)';
-    whatsappButton.style.boxShadow = '0 25px 30px -5px rgba(0, 0, 0, 0.2)';
-});
-
-whatsappButton.addEventListener('mouseleave', () => {
-    whatsappButton.style.transform = 'scale(1)';
-    whatsappButton.style.boxShadow = 'var(--shadow-large)';
-});
-
-document.body.appendChild(whatsappButton);
 
