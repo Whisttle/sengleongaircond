@@ -194,6 +194,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Responsive: update on window resize
     window.addEventListener('resize', () => goToSlide(current));
 });
+
 // Number count-up animation for .stat-number elements
 document.addEventListener('DOMContentLoaded', function () {
     function animateCountUp(el, target, duration) {
@@ -202,6 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const isPercent = /%$/.test(target);
         const isPlus = /\+$/.test(target);
         const cleanTarget = parseFloat(target.replace(/[^\d.]/g, ''));
+        
         function step(timestamp) {
             if (!startTimestamp) startTimestamp = timestamp;
             const progress = Math.min((timestamp - startTimestamp) / duration, 1);
@@ -216,38 +218,125 @@ document.addEventListener('DOMContentLoaded', function () {
         window.requestAnimationFrame(step);
     }
 
+    // Improved viewport detection for mobile
     function isInViewport(element) {
         const rect = element.getBoundingClientRect();
+        const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+        const windowWidth = window.innerWidth || document.documentElement.clientWidth;
+        
+        // More lenient conditions for mobile
         return (
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+            rect.top >= -100 && // Allow elements slightly above viewport
+            rect.left >= -50 &&  // Allow elements slightly to the left
+            rect.bottom <= windowHeight + 100 && // Allow elements slightly below viewport
+            rect.right <= windowWidth + 50 &&    // Allow elements slightly to the right
+            rect.width > 0 && rect.height > 0     // Element must be visible
         );
     }
 
-    let animated = false;
+    // Track animated elements to prevent re-animation
+    const animatedElements = new Set();
+    
     function triggerAnimations() {
-        if (animated) return;
         const statNumbers = document.querySelectorAll('.stat-number');
-        let anyVisible = false;
+        
         statNumbers.forEach(function (el) {
+            // Skip if already animated
+            if (animatedElements.has(el)) return;
+            
             if (isInViewport(el)) {
-                anyVisible = true;
-                animateCountUp(el, el.getAttribute('data-target') || el.textContent, 1500);
+                animatedElements.add(el);
+                const target = el.getAttribute('data-target') || el.textContent;
+                animateCountUp(el, target, 1500);
             }
         });
-        if (anyVisible) animated = true;
+    }
+
+    // Force animation on mobile devices after a delay
+    function forceAnimationOnMobile() {
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            setTimeout(() => {
+                const statNumbers = document.querySelectorAll('.stat-number');
+                statNumbers.forEach(function (el) {
+                    if (!animatedElements.has(el)) {
+                        animatedElements.add(el);
+                        const target = el.getAttribute('data-target') || el.textContent;
+                        animateCountUp(el, target, 1500);
+                    }
+                });
+            }, 2000); // Wait 2 seconds then force animation
+        }
     }
 
     // Set data-target attribute for each stat-number
     document.querySelectorAll('.stat-number').forEach(function (el) {
-        el.setAttribute('data-target', el.textContent.trim());
+        if (!el.getAttribute('data-target')) {
+            el.setAttribute('data-target', el.textContent.trim());
+        }
         el.textContent = '0' + (/%$/.test(el.getAttribute('data-target')) ? '%' : '') + (/\+$/.test(el.getAttribute('data-target')) ? '+' : '');
     });
 
+    // Use Intersection Observer for better performance and reliability
+    const observerOptions = {
+        root: null,
+        rootMargin: '50px', // Trigger animation 50px before element enters viewport
+        threshold: 0.1 // Trigger when 10% of element is visible
+    };
+
+    const statObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const el = entry.target.querySelector('.stat-number');
+                if (el && !animatedElements.has(el)) {
+                    animatedElements.add(el);
+                    const target = el.getAttribute('data-target') || el.textContent;
+                    animateCountUp(el, target, 1500);
+                }
+            }
+        });
+    }, observerOptions);
+
+    // Observe all stat items
+    document.querySelectorAll('.stat-item').forEach(item => {
+        statObserver.observe(item);
+    });
+
+    // Fallback methods
     window.addEventListener('scroll', triggerAnimations);
-    triggerAnimations(); // In case already in view
+    window.addEventListener('resize', triggerAnimations);
+    window.addEventListener('orientationchange', () => {
+        setTimeout(triggerAnimations, 500); // Wait for orientation change to complete
+    });
+    
+    // Initial trigger
+    triggerAnimations();
+    
+    // Force animation on mobile as backup
+    forceAnimationOnMobile();
+    
+    // Additional fallback - force animation when expertise section becomes visible
+    const expertiseSection = document.querySelector('.expertise-section');
+    if (expertiseSection) {
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        const statNumbers = document.querySelectorAll('.stat-number');
+                        statNumbers.forEach(function (el) {
+                            if (!animatedElements.has(el)) {
+                                animatedElements.add(el);
+                                const target = el.getAttribute('data-target') || el.textContent;
+                                animateCountUp(el, target, 1500);
+                            }
+                        });
+                    }, 500);
+                }
+            });
+        }, { threshold: 0.2 });
+        
+        sectionObserver.observe(expertiseSection);
+    }
 });
   
 // Mobile Menu Toggle
