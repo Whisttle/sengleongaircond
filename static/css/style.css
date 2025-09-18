@@ -533,14 +533,18 @@ header {
 .brand-slide {
     min-width: 100%;
     width: 100%;
-    height: 70vh;
+    height: auto;
+    min-height: 300px;
+    max-height: 500px;
+    max-width: 100%;
     object-fit: cover;
+    object-position: center;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
-    background: var(--light-gray);
+    
 }
 
 
@@ -565,9 +569,27 @@ header {
     opacity: 1;
     box-shadow: 0 0 0 2px var(--bright-cyan);
 }
+@media (max-width: 1024px) {
+    .brand-slide {
+        min-height: 250px;
+        max-height: 400px;
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .brand-slide {
+        min-height: 200px;
+        max-height: 300px;
+        padding: 1rem;
+    }
+}
+
 @media (max-width: 600px) {
     .brand-slide {
-        height: 180px;
+        min-height: 180px;
+        max-height: 250px;
+        padding: 0.5rem;
     }
     .brand-slide img {
         max-width: 90vw;
