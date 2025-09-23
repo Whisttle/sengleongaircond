@@ -218,20 +218,28 @@
                     <div class="elfsight-app-f1c7e6c9-ea1c-4ef4-8946-ec89aa8d9b84" data-elfsight-app-lazy></div>
                 </div>
             </div>
-            <div class="hero-form">
+                        <div class="hero-form">
                 <h3 class="form-title">{{ page.form_title }}</h3>
                 <p class="form-subtitle">{{ page.form_subtitle }}</p>
                 <form id="quote-form" itemscope itemtype="https://schema.org/ContactPoint" action="{{ page.form_action_url }}" method="POST">
+                    <!-- FormSubmit Configuration -->
+                    <input type="hidden" name="_subject" value="New Air Conditioning Quote Request from {{ page.company_name }} Website">
+                    <input type="hidden" name="_captcha" value="false">
+                    <input type="hidden" name="_template" value="table">
+                    {% if page.form_redirect_url %}
+                    <input type="hidden" name="_next" value="{{ page.form_redirect_url }}">
+                    {% endif %}
+                    
                     <div class="form-row">
                         <div class="form-group form-half">
-                            <input type="text" class="form-input" name="name" placeholder="Name" required>
+                            <input type="text" class="form-input" name="name" placeholder="Full Name" required>
                         </div>
                         <div class="form-group form-half">
-                            <input type="email" class="form-input" name="email" placeholder="Email" required>
+                            <input type="email" class="form-input" name="email" placeholder="Email Address" required>
                         </div>
                     </div>
                     <div class="form-group">
-                        <input type="tel" class="form-input" name="phone" placeholder="Phone" required>
+                        <input type="tel" class="form-input" name="phone" placeholder="Phone Number" required>
                     </div>
                     <div class="form-group">
                         <input type="text" class="form-input" name="budget" placeholder="Budget (e.g. RM2000)">
@@ -240,7 +248,7 @@
                         <input type="text" class="form-input" name="location" placeholder="Location Area (e.g. Klang, PJ, KL)" required>
                     </div>
                     <div class="form-group">
-                        <textarea class="form-input" name="comment" placeholder="Comment (optional)" rows="3" ></textarea>
+                        <textarea class="form-input" name="message" placeholder="Additional requirements or comments (optional)" rows="3"></textarea>
                     </div>
                     <button type="submit" class="cta-button">Get Free Quote Now</button>
                 </form>
@@ -815,22 +823,30 @@ Their team was punctual, professional, and efficient, completing the job with ex
 
         // Form Submission
         const quoteForm = document.getElementById('quote-form');
-        quoteForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            // Get form data
-            const formData = new FormData(quoteForm);
-            const data = Object.fromEntries(formData);
-            
-            // Show success message (replace with actual form handling)
-            alert('Thank you for your inquiry! We will contact you within 24 hours with your free quote.');
-            
-            // Reset form
-            quoteForm.reset();
-            
-            // In a real application, you would send this data to your server
-            console.log('Form submitted:', data);
-        });
+        if (quoteForm) {
+            quoteForm.addEventListener('submit', (e) => {
+                // Let the form submit normally to FormSubmit
+                // Add loading state to button
+                const submitButton = quoteForm.querySelector('button[type="submit"]');
+                const originalText = submitButton.textContent;
+                
+                submitButton.textContent = 'Sending...';
+                submitButton.disabled = true;
+                
+                // FormSubmit will handle the actual submission
+                // The form will redirect or show success based on FormSubmit configuration
+                
+                // Optional: Add Google Analytics tracking
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'form_submit', {
+                        'event_category': 'engagement',
+                        'event_label': 'quote_request'
+                    });
+                }
+                
+                console.log('Form submitted to:', quoteForm.action);
+            });
+        }
 
         // Animate stats on scroll
         const observerOptions = {

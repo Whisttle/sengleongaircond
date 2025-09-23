@@ -146,6 +146,16 @@ class HomePage(Page):
         default="https://formsubmit.co/karimazizc@gmail.com",
         help_text="Form submission URL"
     )
+    form_redirect_url = models.URLField(
+        blank=True,
+        default="",
+        help_text="URL to redirect after form submission (optional)"
+    )
+    form_success_message = models.CharField(
+        max_length=300,
+        default="Thank you for your inquiry! We will contact you within 24 hours with your free quote.",
+        help_text="Success message shown after form submission"
+    )
     
     # Services Section
     services_title = models.CharField(
@@ -275,6 +285,8 @@ class HomePage(Page):
             FieldPanel('form_title'),
             FieldPanel('form_subtitle'),
             FieldPanel('form_action_url'),
+            FieldPanel('form_redirect_url'),
+            FieldPanel('form_success_message'),
         ], heading="Contact Form"),
     ]
     
@@ -349,3 +361,7 @@ class HomePage(Page):
         ObjectList(contact_panels, heading='Contact'),
         ObjectList(seo_panels, heading='SEO'),
     ])
+
+
+
+
