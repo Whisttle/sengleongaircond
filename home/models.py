@@ -142,19 +142,19 @@ class HomePage(Page):
         default="Contact us today for professional air conditioning supply in Klang Valley",
         help_text="Subtitle for the contact form"
     )
-    form_action_url = models.URLField(
-        default="https://formsubmit.co/karimazizc@gmail.com",
-        help_text="Form submission URL"
+    form_whatsapp_number = models.CharField(
+        max_length=20,
+        default="60122992909",
+        help_text="WhatsApp number (without + sign) for form submissions"
     )
-    form_redirect_url = models.URLField(
-        blank=True,
-        default="",
-        help_text="URL to redirect after form submission (optional)"
+    form_whatsapp_message_template = models.TextField(
+        default="Hi! I'm interested in getting a quote for air conditioning service.\n\n*Name:* {name}\n*Email:* {email}\n*Phone:* {phone}\n*Budget:* {budget}\n*Location:* {location}\n*Requirements:* {message}\n\nPlease contact me for a free quote. Thank you!",
+        help_text="WhatsApp message template. Use {name}, {email}, {phone}, {budget}, {location}, {message} as placeholders"
     )
     form_success_message = models.CharField(
         max_length=300,
-        default="Thank you for your inquiry! We will contact you within 24 hours with your free quote.",
-        help_text="Success message shown after form submission"
+        default="Redirecting to WhatsApp to send your inquiry...",
+        help_text="Success message shown before redirecting to WhatsApp"
     )
     
     # Services Section
@@ -284,10 +284,10 @@ class HomePage(Page):
         MultiFieldPanel([
             FieldPanel('form_title'),
             FieldPanel('form_subtitle'),
-            FieldPanel('form_action_url'),
-            FieldPanel('form_redirect_url'),
+            FieldPanel('form_whatsapp_number'),
+            FieldPanel('form_whatsapp_message_template'),
             FieldPanel('form_success_message'),
-        ], heading="Contact Form"),
+        ], heading="WhatsApp Contact Form"),
     ]
     
     services_panels = [

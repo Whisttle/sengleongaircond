@@ -1,6 +1,8 @@
 <!DOCTYPE html>
+{% load favicon_tags %}
 <html lang="en">
     <head>
+        {% favicon_meta %}
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
@@ -119,8 +121,6 @@
 
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
-    {% block body_class %}Home Page{% endblock %}
-
     {% block content %}
 
     <!-- Header & Navigation -->
@@ -218,18 +218,14 @@
                     <div class="elfsight-app-f1c7e6c9-ea1c-4ef4-8946-ec89aa8d9b84" data-elfsight-app-lazy></div>
                 </div>
             </div>
-                        <div class="hero-form">
+            <div class="hero-form">
                 <h3 class="form-title">{{ page.form_title }}</h3>
                 <p class="form-subtitle">{{ page.form_subtitle }}</p>
-                <form id="quote-form" itemscope itemtype="https://schema.org/ContactPoint" action="{{ page.form_action_url }}" method="POST">
-                    <!-- FormSubmit Configuration -->
-                    <input type="hidden" name="_subject" value="New Air Conditioning Quote Request from {{ page.company_name }} Website">
-                    <input type="hidden" name="_captcha" value="false">
-                    <input type="hidden" name="_template" value="table">
-                    {% if page.form_redirect_url %}
-                    <input type="hidden" name="_next" value="{{ page.form_redirect_url }}">
-                    {% endif %}
-                    
+                
+                <!-- Message Display -->
+                <div class="message" id="form-message" style="display: none; padding: 15px; border-radius: 8px; margin: 20px 0;"></div>
+                
+                <form id="quote-form" itemscope itemtype="https://schema.org/ContactPoint">
                     <div class="form-row">
                         <div class="form-group form-half">
                             <input type="text" class="form-input" name="name" placeholder="Full Name" required>
@@ -250,7 +246,10 @@
                     <div class="form-group">
                         <textarea class="form-input" name="message" placeholder="Additional requirements or comments (optional)" rows="3"></textarea>
                     </div>
-                    <button type="submit" class="cta-button">Get Free Quote Now</button>
+                    <button type="submit" class="cta-button" id="submit-btn">
+                        <span class="loading-spinner" id="loading" style="display: none; width: 20px; height: 20px; border: 2px solid transparent; border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 10px;"></span>
+                        <span id="button-text">Get Free Quote Now</span>
+                    </button>
                 </form>
             </div>
         </div>
@@ -265,7 +264,7 @@
             <div class="usp-grid">
                 {% for feature in page.usp_features.all %}
                 <div class="usp-card">
-                    <div class="usp-icon">
+                   <div class="usp-icon">
                         <i class="{{ feature.icon_class }}"></i>
                     </div>
                     <h3 class="usp-title">{{ feature.title }}</h3>
@@ -324,99 +323,6 @@
             <p class="section-subtitle">Real feedback from satisfied customers across Klang Valley, Selangor, and Kuala Lumpur</p>
             
             <div class="testimonials-carousel">
-                <!-- <button class="testimonial-arrow testimonial-arrow-left" type="button">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                
-                <div class="testimonials-container">
-                    <div class="testimonials-grid">
-                        <div class="testimonial-card">
-                            <i class="fas fa-quote-right quote-icon"></i>
-                            <p class="testimonial-text">"Found thru shopee. But shop at the store physically. Bought Midea 1.0HP Inverter 5.0 ⭐️. Use it for my Master bedroom and it works like wonder eventhough I set it only at 24 degree. The best price I get from the owner herself. Owner very pretty helpful and kind. I totally recommended this shop!."</p>
-                            <div class="testimonial-author">
-                                <div class="author-avatar">ZH</div>
-                                <div class="author-info">
-                                    <h4>Muhammad Fadhil Mohd Azhar</h4>
-                                    <p>Google Reviewer</p>
-                                    <span itemprop="ratingValue">5</span> ⭐⭐⭐⭐⭐
-                                </div>
-                               
-                            </div>
-            
-                        </div>
-
-                        <div class="testimonial-card">
-                            <i class="fas fa-quote-right quote-icon"></i>
-                            <p class="testimonial-text">"Good product quality, fast service and staff very friendly and helpful. I highly recommend this seller."</p>
-                            <div class="testimonial-author">
-                                <div class="author-avatar">AR</div>
-                                <div class="author-info">
-                                    <h4>Norizal Ahmad</h4>
-                                    <p>Google Reviewer</p>
-                                    <span itemprop="ratingValue">5</span> ⭐⭐⭐⭐⭐
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="testimonial-card">
-                            <i class="fas fa-quote-right quote-icon"></i>
-                            <p class="testimonial-text">"I called them for an emergency fix on a weekend and was blown away by the response time. Their technician arrived within 2 hours and had my unit running in no time. Honest pricing too. Highly recommended!"</p>
-                            <div class="testimonial-author">
-                                <div class="author-avatar">AF</div>
-                                <div class="author-info">
-                                    <h4>Daniel Daraup</h4>
-                                    <p>Google Reviewer</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="testimonial-card">
-                            <i class="fas fa-quote-right quote-icon"></i>
-                            <p class="testimonial-text">"I recently purchased and installed an air conditioner through Seng Leong Engineering, and I couldn’t be happier with the service. They offer some of the best prices in the Klang Valley, and what’s even better — the price includes installation, with no hidden charges.
-
-Their team was punctual, professional, and efficient, completing the job with excellent workmanship. The installation was clean and tidy, and everything was done exactly as promised. You can tell they take pride in their work and prioritize customer satisfaction."</p>
-                            <div class="testimonial-author">
-                                <div class="author-avatar">NH</div>
-                                <div class="author-info">
-                                    <h4>Nurul Huda</h4>
-                                    <p>Homeowner</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="testimonial-card">
-                            <i class="fas fa-quote-right quote-icon"></i>
-                            <p class="testimonial-text">"Quick response, fair pricing, and excellent workmanship. They installed our new system professionally and provided clear maintenance instructions. Very satisfied with their service!"</p>
-                            <div class="testimonial-author">
-                                <div class="author-avatar">LW</div>
-                                <div class="author-info">
-                                    <h4>Lee Wei Ming</h4>
-                                    <p>Shop Owner</p>
-                                </div
-                            </div>
-                        </div>
-
-                        <div class="testimonial-card">
-                            <i class="fas fa-quote-right quote-icon"></i>
-                            <p class="testimonial-text">"Professional team with genuine spare parts. They diagnosed the issue quickly and completed the repair efficiently. Great value for money and excellent customer service."</p>
-                            <div class="testimonial-author">
-                                <div class="author-avatar">ST</div>
-                                <div class="author-info">
-                                    <h4>Sarah Tan</h4>
-                                    <p>Office Manager</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-              
-                </div>
-                  
-                <button class="testimonial-arrow testimonial-arrow-right" type="button">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-                
-                <div class="testimonial-dots"></div> -->
                       <!-- Elfsight Google Reviews | Untitled Google Reviews -->
                 <script src="https://elfsightcdn.com/platform.js" async></script>
                 <div class="elfsight-app-953cfb60-2f8f-445b-92f9-9380097ebe47" data-elfsight-app-lazy></div>
@@ -430,7 +336,179 @@ Their team was punctual, professional, and efficient, completing the job with ex
 
     {% endblock content %}
     <script>
-                // Testimonials Carousel Slider
+        // WhatsApp Form Handler Class
+        class WhatsAppFormHandler {
+            constructor() {
+                this.form = document.getElementById('quote-form');
+                this.submitBtn = document.getElementById('submit-btn');
+                this.buttonText = document.getElementById('button-text');
+                this.loading = document.getElementById('loading');
+                this.messageDiv = document.getElementById('form-message');
+                
+                // Get WhatsApp number and message template from CMS
+                this.whatsappNumber = '{{ page.form_whatsapp_number }}';
+                this.messageTemplate = `{{ page.form_whatsapp_message_template|escapejs }}`;
+                
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            }
+
+            collectFormData() {
+                const formData = new FormData(this.form);
+                return {
+                    name: formData.get('name') || '',
+                    email: formData.get('email') || '',
+                    phone: formData.get('phone') || '',
+                    budget: formData.get('budget') || '',
+                    location: formData.get('location') || '',
+                    message: formData.get('message') || '',
+                    timestamp: new Date().toLocaleString('en-MY', {
+                        timeZone: 'Asia/Kuala_Lumpur',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })
+                };
+            }
+
+            formatWhatsAppMessage(data) {
+                // Use the CMS template if available, otherwise use default format
+                if (this.messageTemplate && this.messageTemplate.trim() !== '') {
+                    return this.messageTemplate
+                        .replace(/{name}/g, data.name)
+                        .replace(/{email}/g, data.email)
+                        .replace(/{phone}/g, data.phone)
+                        .replace(/{budget}/g, data.budget)
+                        .replace(/{location}/g, data.location)
+                        .replace(/{message}/g, data.message);
+                } else {
+                    // Fallback to default format
+                    let message = `🎯 NEW QUOTE REQUEST\n\n`;
+                    message += `👤 Customer Details:\n`;
+                    message += `• Name: ${data.name}\n`;
+                    message += `• Email: ${data.email}\n`;
+                    message += `• Phone: ${data.phone}\n\n`;
+                    message += `📍 Service Details:\n`;
+                    message += `• Location: ${data.location}\n`;
+                    
+                    if (data.budget) {
+                        message += `• Budget: ${data.budget}\n`;
+                    }
+                    
+                    if (data.message) {
+                        message += `\n💬 Additional Comments:\n${data.message}\n`;
+                    }
+                    
+                    return message;
+                }
+            }
+
+            generateWhatsAppURL(message) {
+                if (!this.whatsappNumber) {
+                    throw new Error('WhatsApp number not configured');
+                }
+
+                // Clean phone number thoroughly
+                // Remove spaces, dashes, plus signs, parentheses, and any non-digit characters
+                // Also handle Unicode characters that might be invisible
+                let cleanPhone = this.whatsappNumber
+                    .trim() // Remove leading/trailing whitespace
+                    .replace(/[\u200B-\u200D\uFEFF\u202A-\u202E]/g, '') // Remove invisible Unicode characters
+                    .replace(/[^\d]/g, ''); // Keep only digits
+                
+                // Debug logging
+                console.log('Original phone:', this.whatsappNumber);
+                console.log('Cleaned phone:', cleanPhone);
+                
+                if (!cleanPhone || cleanPhone.length < 10) {
+                    throw new Error('Invalid phone number after cleaning');
+                }
+                
+                // Encode the message for URL
+                const encodedMessage = encodeURIComponent(message);
+                
+                // Generate WhatsApp Web URL
+                const whatsappURL = `https://api.whatsapp.com/send/?phone=${cleanPhone}&text=${encodedMessage}&type=phone_number&app_absent=0`;
+                
+                return whatsappURL;
+            }
+
+            openWhatsApp(url) {
+                // Open WhatsApp in new window/tab
+                window.open(url, '_blank', 'noopener,noreferrer');
+            }
+
+            showMessage(text, type = 'success') {
+                this.messageDiv.textContent = text;
+                this.messageDiv.style.display = 'block';
+                this.messageDiv.style.background = type === 'success' ? '#d4edda' : '#f8d7da';
+                this.messageDiv.style.color = type === 'success' ? '#155724' : '#721c24';
+                this.messageDiv.style.border = type === 'success' ? '1px solid #c3e6cb' : '1px solid #f5c6cb';
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    this.messageDiv.style.display = 'none';
+                }, 5000);
+            }
+
+            setLoading(isLoading) {
+                this.submitBtn.disabled = isLoading;
+                this.loading.style.display = isLoading ? 'inline-block' : 'none';
+                this.buttonText.textContent = isLoading ? 'Sending...' : 'Get Free Quote Now';
+            }
+
+            async handleSubmit(e) {
+                e.preventDefault();
+                
+                this.setLoading(true);
+                
+                try {
+                    const formData = this.collectFormData();
+                    const whatsappMessage = this.formatWhatsAppMessage(formData);
+                    
+                    // Generate WhatsApp Web URL
+                    const whatsappURL = this.generateWhatsAppURL(whatsappMessage);
+                    
+                    // Open WhatsApp
+                    this.openWhatsApp(whatsappURL);
+                    
+                    this.showMessage('{{ page.form_success_message|escapejs }}', 'success');
+                    this.form.reset();
+                    
+                    // Optional: Log the URL for debugging
+                    console.log('WhatsApp URL:', whatsappURL);
+                    
+                } catch (error) {
+                    console.error('Error generating WhatsApp link:', error);
+                    this.showMessage(`❌ Error: ${error.message}`, 'error');
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+        }
+
+        // Initialize WhatsApp Form Handler
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the WhatsApp form handler
+            window.whatsappForm = new WhatsAppFormHandler();
+        });
+
+        // Add CSS animation for loading spinner
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        {% comment %} // Testimonials Carousel Slider
         document.addEventListener('DOMContentLoaded', function () {
             const testimonialCarousel = document.querySelector('.testimonials-carousel');
             if (!testimonialCarousel) return;
@@ -538,7 +616,7 @@ Their team was punctual, professional, and efficient, completing the job with ex
             
             // Initialize the carousel
             init();
-        });
+        }); {% endcomment %}
 
         // Brand Carousel Slider
         document.addEventListener('DOMContentLoaded', function () {
@@ -820,33 +898,6 @@ Their team was punctual, professional, and efficient, completing the job with ex
                 icon.classList.remove('fa-times');
             });
         });
-
-        // Form Submission
-        const quoteForm = document.getElementById('quote-form');
-        if (quoteForm) {
-            quoteForm.addEventListener('submit', (e) => {
-                // Let the form submit normally to FormSubmit
-                // Add loading state to button
-                const submitButton = quoteForm.querySelector('button[type="submit"]');
-                const originalText = submitButton.textContent;
-                
-                submitButton.textContent = 'Sending...';
-                submitButton.disabled = true;
-                
-                // FormSubmit will handle the actual submission
-                // The form will redirect or show success based on FormSubmit configuration
-                
-                // Optional: Add Google Analytics tracking
-                if (typeof gtag !== 'undefined') {
-                    gtag('event', 'form_submit', {
-                        'event_category': 'engagement',
-                        'event_label': 'quote_request'
-                    });
-                }
-                
-                console.log('Form submitted to:', quoteForm.action);
-            });
-        }
 
         // Animate stats on scroll
         const observerOptions = {
