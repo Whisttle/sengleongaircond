@@ -496,7 +496,38 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize the WhatsApp form handler
             window.whatsappForm = new WhatsAppFormHandler();
+            
+            // Fix WhatsApp links with clean phone numbers
+            fixWhatsAppLinks();
         });
+
+        // Function to clean phone numbers and fix WhatsApp links
+        function fixWhatsAppLinks() {
+            const rawWhatsAppNumber = '{{ page.whatsapp_number }}';
+            const whatsAppMessage = `{{ page.whatsapp_message|escapejs }}`;
+            
+            // Clean phone number thoroughly
+            const cleanPhone = rawWhatsAppNumber
+                .trim()
+                .replace(/[\u200B-\u200D\uFEFF\u202A-\u202E]/g, '') // Remove invisible Unicode characters
+                .replace(/[^\d]/g, ''); // Keep only digits
+            
+            console.log('Footer WhatsApp - Original phone:', rawWhatsAppNumber);
+            console.log('Footer WhatsApp - Cleaned phone:', cleanPhone);
+            
+            if (cleanPhone && cleanPhone.length >= 10) {
+                // Update all WhatsApp links on the page
+                const whatsappLinks = document.querySelectorAll('a[href*="wa.me"]');
+                whatsappLinks.forEach(link => {
+                    const encodedMessage = encodeURIComponent(whatsAppMessage);
+                    const newHref = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
+                    link.href = newHref;
+                    console.log('Updated WhatsApp link:', newHref);
+                });
+            } else {
+                console.error('Invalid WhatsApp number after cleaning:', cleanPhone);
+            }
+        }
 
         // Add CSS animation for loading spinner
         const style = document.createElement('style');
@@ -1056,7 +1087,7 @@
                         <i class="fab fa-facebook-f"></i>
                     </a>
                     {% endif %}
-                    <a href="https://wa.me/{{ page.whatsapp_number }}?text={{ page.whatsapp_message|urlencode }}" class="social-link" target="_blank">
+                    <a href="https://wa.me/{{page.whatsapp_number}}?text={{ page.whatsapp_message|urlencode }}" class="social-link" target="_blank">
                         <i class="fab fa-whatsapp"></i>
                     </a>
                 </div>
