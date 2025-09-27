@@ -81,6 +81,160 @@ class BrandPartner(Orderable):
     ]
 
 
+# Google Review Model
+class GoogleReview(Orderable):
+    page = ParentalKey('home.HomePage', related_name='google_reviews', on_delete=models.CASCADE)
+    
+    AVATAR_COLOR_CHOICES = [
+        ('#e91e63', 'Pink'),
+        ('#ff5722', 'Deep Orange'),
+        ('#795548', 'Brown'),
+        ('#607d8b', 'Blue Grey'),
+        ('#9c27b0', 'Purple'),
+        ('#3f51b5', 'Indigo'),
+        ('#2196f3', 'Blue'),
+        ('#009688', 'Teal'),
+        ('#4caf50', 'Green'),
+        ('#ff9800', 'Orange'),
+        ('#f44336', 'Red'),
+        ('#673ab7', 'Deep Purple'),
+    ]
+    
+    REVIEW_SOURCE_CHOICES = [
+        ('google', 'Google'),
+        ('facebook', 'Facebook'),
+        ('trustpilot', 'Trustpilot'),
+        ('yelp', 'Yelp'),
+        ('website', 'Website'),
+    ]
+    
+    # Basic Information
+    name = models.CharField(
+        max_length=100,
+        help_text="Customer's name"
+    )
+    profile_picture = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        help_text="Optional profile picture - will be cropped to circle"
+    )
+    avatar_color = models.CharField(
+        max_length=7,
+        choices=AVATAR_COLOR_CHOICES,
+        default='#e91e63',
+        help_text="Color for the avatar background (used if no profile picture)"
+    )
+    
+    # Review Content
+    review_text = models.TextField(
+        max_length=800,
+        help_text="The review content - will be truncated with 'Read more' if too long"
+    )
+    rating = models.IntegerField(
+        default=5,
+        choices=[(i, f"{i} Star{'s' if i != 1 else ''}") for i in range(1, 6)],
+        help_text="Star rating (1-5)"
+    )
+    
+    # Review Source and Date
+    review_source = models.CharField(
+        max_length=20,
+        choices=REVIEW_SOURCE_CHOICES,
+        default='google',
+        help_text="Platform where the review was posted"
+    )
+    review_date = models.DateTimeField(
+        help_text="Date when the review was posted (leave blank for auto-fill)"
+    )
+    is_verified = models.BooleanField(
+        default=True,
+        help_text="Show verified badge"
+    )
+    
+    # Display Options
+    is_featured = models.BooleanField(
+        default=False,
+        help_text="Feature this review (will appear first in slider)"
+    )
+    
+    panels = [
+        MultiFieldPanel([
+            FieldPanel('name'),
+            FieldPanel('profile_picture'),
+            FieldPanel('avatar_color'),
+        ], heading="Reviewer Information"),
+        MultiFieldPanel([
+            FieldPanel('review_text'),
+            FieldPanel('rating'),
+            FieldPanel('review_source'),
+        ], heading="Review Content"),
+        MultiFieldPanel([
+            FieldPanel('review_date'),
+            FieldPanel('is_verified'),
+            FieldPanel('is_featured'),
+        ], heading="Review Settings"),
+    ]
+    
+    class Meta:
+        ordering = ['-is_featured', '-review_date']
+    
+    def save(self, *args, **kwargs):
+        # Auto-fill review_date if not provided
+        if not self.review_date:
+            from django.utils import timezone
+            self.review_date = timezone.now()
+        super().save(*args, **kwargs)
+    
+    def get_avatar_initial(self):
+        """Get the first letter of the name for avatar"""
+        return self.name[0].upper() if self.name else '?'
+    
+    def get_time_ago(self):
+        """Get human-readable time since review was posted"""
+        from django.utils import timezone
+        import datetime
+        
+        now = timezone.now()
+        diff = now - self.review_date
+        
+        if diff.days > 365:
+            years = diff.days // 365
+            return f"{years} year{'s' if years != 1 else ''} ago"
+        elif diff.days > 30:
+            months = diff.days // 30
+            return f"{months} month{'s' if months != 1 else ''} ago"
+        elif diff.days > 0:
+            return f"{diff.days} day{'s' if diff.days != 1 else ''} ago"
+        elif diff.seconds > 3600:
+            hours = diff.seconds // 3600
+            return f"{hours} hour{'s' if hours != 1 else ''} ago"
+        else:
+            return "Recently"
+    
+    def get_source_icon(self):
+        """Get the appropriate icon class for the review source"""
+        icon_map = {
+            'google': 'fab fa-google',
+            'facebook': 'fab fa-facebook',
+            'trustpilot': 'fas fa-star',
+            'yelp': 'fab fa-yelp',
+            'website': 'fas fa-globe',
+        }
+        return icon_map.get(self.review_source, 'fas fa-star')
+    
+    def get_truncated_text(self, max_length=150):
+        """Get truncated review text with ellipsis"""
+        if len(self.review_text) <= max_length:
+            return self.review_text
+        return self.review_text[:max_length].rsplit(' ', 1)[0] + '...'
+    
+    def __str__(self):
+        return f"{self.name} - {self.rating} stars ({self.review_source})"
+
+
 class HomePage(Page):
     # Ensure only one home page can be created
     max_count = 1
@@ -204,12 +358,27 @@ class HomePage(Page):
         default="Real feedback from satisfied customers across Klang Valley, Selangor, and Kuala Lumpur",
         help_text="Subtitle for testimonials section"
     )
-    testimonials_embed_code = models.TextField(
-        blank=True,
-        default='<div class="elfsight-app-953cfb60-2f8f-445b-92f9-9380097ebe47" data-elfsight-app-lazy></div>',
-        help_text="Elfsight or other testimonials widget embed code"
-    )
     
+    # Google Review Widget Section
+    google_widget_enabled = models.BooleanField(
+        default=True,
+        help_text="Show Google review widget in hero section"
+    )
+    google_widget_rating = models.DecimalField(
+        max_digits=2,
+        decimal_places=1,
+        default=4.7,
+        help_text="Overall Google rating (e.g., 4.7)"
+    )
+    google_widget_review_count = models.PositiveIntegerField(
+        default=16892,
+        help_text="Total number of Google reviews"
+    )
+    google_widget_url = models.URLField(
+        blank=True,
+        default="https://www.google.com/maps/place/Seng+Leong+Engineering+Sdn+Bhd/data=!4m2!3m1!1s0x0:0x8bf3d80f0f4ec0bc?sa=X&ved=1t:2428&ictx=111",
+        help_text="Link to Google Business profile/reviews"
+    )
     # Contact Section
     company_name = models.CharField(
         max_length=100,
@@ -319,8 +488,14 @@ class HomePage(Page):
         MultiFieldPanel([
             FieldPanel('testimonials_title'),
             FieldPanel('testimonials_subtitle'),
-            FieldPanel('testimonials_embed_code'),
         ], heading="Testimonials Section"),
+        MultiFieldPanel([
+            FieldPanel('google_widget_enabled'),
+            FieldPanel('google_widget_rating'),
+            FieldPanel('google_widget_review_count'),
+            FieldPanel('google_widget_url'),
+        ], heading="Google Review Widget"),
+        InlinePanel('google_reviews', heading="Google Reviews", min_num=1),
     ]
     
     contact_panels = [

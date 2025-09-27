@@ -127,7 +127,7 @@
     {% if page.show_navigation %} 
         <header>
             <nav class="nav-container">
-                <a href="index.html" class="logo" style="display:inline-block; max-width:100%;">
+                <a href="#home" class="logo" style="display:inline-block; max-width:100%;">
                     <span style="display: flex; align-items: center; gap: 8px; max-width: 100%; width: 100%;">
                         <img src="{% static "images/SL_HD_logo.jpg" %}" alt="logo-icon" class="logo-icon" >
                         <span class="company-name" >{{ page.company_name }}</span>
@@ -207,16 +207,56 @@
 
 
         <!-- Hero Section -->
-    <section class="hero" id="home"{% if page.hero_background_image %} style="background-image: url('{{ page.hero_background_image.url }}');"{% endif %}>
+    {% if page.hero_background_image %}
+    {% load wagtailimages_tags %}
+    {% image page.hero_background_image original as background_image %}
+    <section class="hero" id="home" style="background-image: url('{{ background_image.url }}');">
+    {% else %}
+    <section class="hero" id="home"> {% endif %}
         <div class="hero-container">
             <div class="hero-content">
                 <h1 class="hero-title">{{ page.hero_title }}</h1>
                 <p class="hero-description">{{ page.hero_description }}</p>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-                    <!-- Elfsight Google Reviews | Untitled Google Reviews -->
-                    <script src="https://elfsightcdn.com/platform.js" async></script>
-                    <div class="elfsight-app-f1c7e6c9-ea1c-4ef4-8946-ec89aa8d9b84" data-elfsight-app-lazy></div>
+                {% if page.google_widget_enabled %}
+                <div class="google-reviews-widget">
+                    <a href="{{ page.google_widget_url }}" target="_blank" rel="noopener noreferrer" class="google-widget-link">
+                        <div class="google-widget-container">
+                            <!-- Google Logo -->
+                            <div class="google-logo">
+                                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                                </svg>
+                            </div>
+                            
+                            <!-- Rating and Review Count -->
+                            <div class="google-widget-content">
+                                <div class="google-rating-row">
+                                    <span class="google-rating-number">{{ page.google_widget_rating }}</span>
+                                    <div class="google-stars">
+                                        {% with rating=page.google_widget_rating|floatformat:1|add:0 %}
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= rating %}
+                                                    <i class="fa-solid fa-star" style="color: #FFD700;"></i>
+                                                {% elif forloop.counter|add:"-1" < rating %}
+                                                    <i class="fa-solid" style="color: #FFD700;"></i>
+                                                {% else %}
+                                                    <i class="fa-solid fa-star" style="color: #FFD700;"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                                <div class="google-review-count">
+                                    {{ page.google_widget_review_count|floatformat:0 }} reviews
+                                </div>
+                            </div>
+                        </div>
+                    </a>
                 </div>
+                {% endif %}
             </div>
             <div class="hero-form">
                 <h3 class="form-title">{{ page.form_title }}</h3>
@@ -317,22 +357,143 @@
     </section>
 
      <!-- Testimonials Section -->
-    <section class="testimonials-section" id="testimonials">
+     <!-- Google Reviews Section -->
+    <section class="google-reviews-section" id="testimonials">
         <div class="container">
-            <h2 class="section-title">Customer Reviews & Testimonials</h2>
-            <p class="section-subtitle">Real feedback from satisfied customers across Klang Valley, Selangor, and Kuala Lumpur</p>
+            <h2 class="section-title">{{ page.testimonials_title }}</h2>
+            <p class="section-subtitle">{{ page.testimonials_subtitle }}</p>
             
-            <div class="testimonials-carousel">
-                      <!-- Elfsight Google Reviews | Untitled Google Reviews -->
-                <script src="https://elfsightcdn.com/platform.js" async></script>
-                <div class="elfsight-app-953cfb60-2f8f-445b-92f9-9380097ebe47" data-elfsight-app-lazy></div>
-
-                <div class="cta-section" style="width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 2rem;">
-                    <a href="#home" style="width: 50%;"><button class="cta-button"style="border-radius: 16px !important;">Get Quote</button></a>
+            <div class="google-reviews-carousel">
+                <button class="google-reviews-arrow google-reviews-arrow-left" type="button" aria-label="Previous reviews">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                
+                <div class="google-reviews-container">
+                    <div class="google-reviews-grid">
+                        {% for review in page.google_reviews.all %}
+                        <div class="google-review-card">
+                            <!-- Review Header -->
+                            <div class="review-header">
+                                <div class="reviewer-info">
+                                    <div class="reviewer-avatar">
+                                        {% if review.profile_picture %}
+                                            {% comment %} <img src="{{ review.profile_picture.url }}" alt="{{ review.name }}" > {% endcomment %}
+                                            {% load wagtailimages_tags %}
+                                            {% for review in page.google_reviews.all %}
+                                            {% comment %} {% image review.image alt=review.alt_text original loading="lazy" width='100%' object-fit ='cover'%} {% endcomment %}
+                                            {% image review.profile_picture alt=review.alt_text original%}
+                                            {% endfor %}
+                                        {% else %}
+                                            <span class="avatar-initial" style="background-color: {{ review.avatar_color }}">
+                                                {{ review.get_avatar_initial }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="reviewer-details">
+                                        <h4 class="reviewer-name">{{ review.name }}</h4>
+                                        <p class="review-time">{{ review.get_time_ago }}</p>
+                                    </div>
+                                </div>
+                                <div class="review-source">
+                                    <i class="{{ review.get_source_icon }}" aria-label="{{ review.get_review_source_display }}"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Star Rating -->
+                            <div class="review-rating">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                        <i class="fas fa-star star-filled" aria-hidden="true"></i>
+                                    {% else %}
+                                        <i class="far fa-star star-empty" aria-hidden="true"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Review Text -->
+                            <div class="review-content">
+                                <p class="review-text">
+                                    <span class="review-text-short">{{ review.get_truncated_text }}</span>
+                                    {% if review.review_text|length > 150 %}
+                                        <span class="review-text-full" style="display: none;">{{ review.review_text }}</span>
+                                        <button class="read-more-btn" type="button" 
+                                                data-reviewer-name="{{ review.name }}"
+                                                data-reviewer-avatar="{% if review.profile_picture %}{{ review.profile_picture.url }}{% endif %}"
+                                                data-avatar-color="{{ review.avatar_color }}"
+                                                data-avatar-initial="{{ review.get_avatar_initial }}"
+                                                data-review-time="{{ review.get_time_ago }}"
+                                                data-review-source="{{ review.get_source_icon }}"
+                                                data-review-rating="{{ review.rating }}"
+                                                data-review-text="{{ review.review_text|escapejs }}"
+                                                data-is-verified="{{ review.is_verified }}">Read more</button>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            
+                            <!-- Verified Badge -->
+                            {% if review.is_verified %}
+                            <div class="verified-badge">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Verified</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <button class="google-reviews-arrow google-reviews-arrow-right" type="button" aria-label="Next reviews">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                
+                <!-- Dots Indicator -->
+                <div class="google-reviews-dots">
+                    {% for review in page.google_reviews.all %}
+                        {% if forloop.counter0|divisibleby:5 or forloop.counter0|divisibleby:3 or forloop.first %}
+                        <button class="google-reviews-dot {% if forloop.first %}active{% endif %}" 
+                                data-slide="{{ forloop.counter0 }}" 
+                                aria-label="Go to slide {{ forloop.counter }}"></button>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Google Review Modal -->
+    <div id="reviewModal" class="review-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" style="display: none;">
+        <div class="review-modal-overlay"></div>
+        <div class="review-modal-content">
+            <button class="review-modal-close" type="button" aria-label="Close review">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="modal-review-header">
+                <div class="modal-reviewer-info">
+                    <div class="modal-reviewer-avatar">
+                        <!-- Avatar will be inserted dynamically -->
+                    </div>
+                    <div class="modal-reviewer-details">
+                        <h3 id="modalTitle" class="modal-reviewer-name">
+                            <!-- Name will be inserted dynamically -->
+                        </h3>
+                        <div class="modal-review-meta">
+                            <span class="modal-review-time"><!-- Time will be inserted dynamically --></span>
+                            <i class="modal-review-source"><!-- Source icon will be inserted dynamically --></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-review-rating">
+                <!-- Stars will be inserted dynamically -->
+            </div>
+            
+            <div class="modal-review-text">
+                <!-- Full review text will be inserted dynamically -->
+            </div>
+        </div>
+    </div>
 
     {% endblock content %}
     <script>
@@ -532,34 +693,181 @@
         `;
         document.head.appendChild(style);
 
-        {% comment %} // Testimonials Carousel Slider
+        // Google Reviews Carousel Slider
         document.addEventListener('DOMContentLoaded', function () {
-            const testimonialCarousel = document.querySelector('.testimonials-carousel');
-            if (!testimonialCarousel) return;
+            const reviewsCarousel = document.querySelector('.google-reviews-carousel');
+            if (!reviewsCarousel) return;
             
-            const grid = testimonialCarousel.querySelector('.testimonials-grid');
-            const cards = Array.from(grid.querySelectorAll('.testimonial-card'));
-            const leftArrow = testimonialCarousel.querySelector('.testimonial-arrow-left');
-            const rightArrow = testimonialCarousel.querySelector('.testimonial-arrow-right');
-            const dotsContainer = testimonialCarousel.querySelector('.testimonial-dots');
+            const grid = reviewsCarousel.querySelector('.google-reviews-grid');
+            const cards = Array.from(grid.querySelectorAll('.google-review-card'));
+            const leftArrow = reviewsCarousel.querySelector('.google-reviews-arrow-left');
+            const rightArrow = reviewsCarousel.querySelector('.google-reviews-arrow-right');
+            const dotsContainer = reviewsCarousel.querySelector('.google-reviews-dots');
             
             let currentSlide = 0;
-            let cardsPerView = 4; // Default for desktop
+            let cardsPerView = 5; // Default for desktop
+            let isAnimating = false;
+            
+            // Modal functionality
+            function initModalFunctionality() {
+                const modal = document.getElementById('reviewModal');
+                const modalOverlay = modal.querySelector('.review-modal-overlay');
+                const modalClose = modal.querySelector('.review-modal-close');
+                const modalContent = modal.querySelector('.review-modal-content');
+                
+                let activeButton = null; // Store reference to the button that opened the modal
+                
+                // Open modal function
+                function openModal(reviewData) {
+                    // Populate modal content
+                    populateModalContent(reviewData);
+                    
+                    // Prevent body scroll
+                    document.body.style.overflow = 'hidden';
+                    
+                    // Show modal
+                    modal.style.display = 'flex';
+                    
+                    // Trigger animation
+                    requestAnimationFrame(() => {
+                        modal.classList.add('active');
+                    });
+                    
+                    // Focus management
+                    modalClose.focus();
+                }
+                
+                // Close modal function
+                function closeModal() {
+                    modal.classList.remove('active');
+                    
+                    // Wait for animation to complete
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        document.body.style.overflow = '';
+                        
+                        // Return focus to the button that opened the modal
+                        if (activeButton) {
+                            activeButton.focus();
+                            activeButton = null;
+                        }
+                    }, 300);
+                }
+                
+                // Populate modal with review data
+                function populateModalContent(data) {
+                    const avatarContainer = modal.querySelector('.modal-reviewer-avatar');
+                    const nameElement = modal.querySelector('.modal-reviewer-name');
+                    const timeElement = modal.querySelector('.modal-review-time');
+                    const sourceElement = modal.querySelector('.modal-review-source');
+                    const ratingContainer = modal.querySelector('.modal-review-rating');
+                    const textElement = modal.querySelector('.modal-review-text');
+                    
+                    // Avatar
+                    if (data.avatarUrl && data.avatarUrl.trim() !== '') {
+                        avatarContainer.innerHTML = `<img src="${data.avatarUrl}" alt="${data.name}" loading="lazy">`;
+                    } else {
+                        avatarContainer.innerHTML = `<span class="avatar-initial" style="background-color: ${data.avatarColor}">${data.avatarInitial}</span>`;
+                    }
+                    
+                    // Name with verified badge
+                    nameElement.innerHTML = data.isVerified === 'True' ? 
+                        `${data.name} <i class="fas fa-check-circle verified-icon"></i>` : 
+                        data.name;
+                    
+                    // Time and source
+                    timeElement.textContent = data.time;
+                    sourceElement.className = `modal-review-source ${data.sourceIcon}`;
+                    
+                    // Rating stars
+                    ratingContainer.innerHTML = '';
+                    for (let i = 1; i <= 5; i++) {
+                        const star = document.createElement('i');
+                        star.className = i <= data.rating ? 'fas fa-star star-filled' : 'far fa-star star-empty';
+                        star.setAttribute('aria-hidden', 'true');
+                        ratingContainer.appendChild(star);
+                    }
+                    
+                    // Review text
+                    textElement.textContent = data.text;
+                }
+                
+                // Event listeners for Read More buttons
+                const readMoreBtns = reviewsCarousel.querySelectorAll('.read-more-btn');
+                readMoreBtns.forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        activeButton = this; // Store reference for focus management
+                        
+                        // Extract data from button attributes
+                        const reviewData = {
+                            name: this.dataset.reviewerName,
+                            avatarUrl: this.dataset.reviewerAvatar,
+                            avatarColor: this.dataset.avatarColor,
+                            avatarInitial: this.dataset.avatarInitial,
+                            time: this.dataset.reviewTime,
+                            sourceIcon: this.dataset.reviewSource,
+                            rating: parseInt(this.dataset.reviewRating),
+                            text: this.dataset.reviewText,
+                            isVerified: this.dataset.isVerified
+                        };
+                        
+                        openModal(reviewData);
+                    });
+                });
+                
+                // Event listeners for closing modal
+                modalClose.addEventListener('click', closeModal);
+                modalOverlay.addEventListener('click', closeModal);
+                
+                // ESC key to close modal
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && modal.classList.contains('active')) {
+                        e.preventDefault();
+                        closeModal();
+                    }
+                });
+                
+                // Focus trap inside modal
+                document.addEventListener('keydown', function(e) {
+                    if (!modal.classList.contains('active')) return;
+                    
+                    if (e.key === 'Tab') {
+                        const focusableElements = modalContent.querySelectorAll(
+                            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                        );
+                        const firstElement = focusableElements[0];
+                        const lastElement = focusableElements[focusableElements.length - 1];
+                        
+                        if (e.shiftKey) {
+                            if (document.activeElement === firstElement) {
+                                e.preventDefault();
+                                lastElement.focus();
+                            }
+                        } else {
+                            if (document.activeElement === lastElement) {
+                                e.preventDefault();
+                                firstElement.focus();
+                            }
+                        }
+                    }
+                });
+            }
             
             // Function to update cards per view based on screen size
             function updateCardsPerView() {
                 if (window.innerWidth <= 768) {
                     cardsPerView = 1;
-                } else if (window.innerWidth <= 1024) {
-                    cardsPerView = 2;
+                } else if (window.innerWidth <= 1200) {
+                    cardsPerView = 3;
                 } else {
-                    cardsPerView = 4;
+                    cardsPerView = 5;
                 }
             }
             
             // Calculate total slides
             function getTotalSlides() {
-                return Math.ceil(cards.length / cardsPerView);
+                return Math.max(1, Math.ceil(cards.length / cardsPerView));
             }
             
             // Create dots
@@ -567,8 +875,10 @@
                 dotsContainer.innerHTML = '';
                 const totalSlides = getTotalSlides();
                 for (let i = 0; i < totalSlides; i++) {
-                    const dot = document.createElement('div');
-                    dot.className = 'testimonial-dot' + (i === 0 ? ' active' : '');
+                    const dot = document.createElement('button');
+                    dot.className = 'google-reviews-dot' + (i === 0 ? ' active' : '');
+                    dot.setAttribute('data-slide', i);
+                    dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
                     dot.addEventListener('click', () => goToSlide(i));
                     dotsContainer.appendChild(dot);
                 }
@@ -576,7 +886,7 @@
             
             // Update dots
             function updateDots() {
-                const dots = dotsContainer.querySelectorAll('.testimonial-dot');
+                const dots = dotsContainer.querySelectorAll('.google-reviews-dot');
                 dots.forEach((dot, index) => {
                     dot.classList.toggle('active', index === currentSlide);
                 });
@@ -584,25 +894,45 @@
             
             // Go to specific slide
             function goToSlide(slideIndex) {
+                if (isAnimating) return;
+                
                 const totalSlides = getTotalSlides();
                 currentSlide = Math.max(0, Math.min(slideIndex, totalSlides - 1));
                 
-                // Calculate the percentage to move based on cards per view
-                const cardWidth = 100 / cardsPerView; // Each card takes this % of container width
-                const translateX = -(currentSlide * cardsPerView * cardWidth);
-                grid.style.transform = `translateX(${translateX}%)`;
+                isAnimating = true;
+                
+                // Calculate the percentage to move
+                const movePercentage = -(currentSlide * (100 / cardsPerView) * cardsPerView);
+                grid.style.transform = `translateX(${movePercentage}%)`;
                 
                 updateDots();
                 updateArrowStates();
+                
+                // Reset animation flag after transition
+                setTimeout(() => {
+                    isAnimating = false;
+                }, 400);
             }
             
             // Update arrow states
             function updateArrowStates() {
                 const totalSlides = getTotalSlides();
-                leftArrow.style.opacity = currentSlide === 0 ? '0.5' : '1';
-                rightArrow.style.opacity = currentSlide === totalSlides - 1 ? '0.5' : '1';
-                leftArrow.style.pointerEvents = currentSlide === 0 ? 'none' : 'auto';
-                rightArrow.style.pointerEvents = currentSlide === totalSlides - 1 ? 'none' : 'auto';
+                
+                if (currentSlide === 0) {
+                    leftArrow.style.opacity = '0.5';
+                    leftArrow.style.pointerEvents = 'none';
+                } else {
+                    leftArrow.style.opacity = '1';
+                    leftArrow.style.pointerEvents = 'auto';
+                }
+                
+                if (currentSlide >= totalSlides - 1) {
+                    rightArrow.style.opacity = '0.5';
+                    rightArrow.style.pointerEvents = 'none';
+                } else {
+                    rightArrow.style.opacity = '1';
+                    rightArrow.style.pointerEvents = 'auto';
+                }
             }
             
             // Next slide
@@ -620,16 +950,62 @@
                 }
             }
             
+            // Keyboard navigation
+            function handleKeyNavigation(e) {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevSlide();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    nextSlide();
+                }
+            }
+            
+            // Touch/swipe support for mobile
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            function handleTouchStart(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            }
+            
+            function handleTouchEnd(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }
+            
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                const diff = touchStartX - touchEndX;
+                
+                if (Math.abs(diff) > swipeThreshold) {
+                    if (diff > 0) {
+                        nextSlide(); // Swipe left - next slide
+                    } else {
+                        prevSlide(); // Swipe right - previous slide
+                    }
+                }
+            }
+            
             // Initialize
             function init() {
                 updateCardsPerView();
                 createDots();
                 goToSlide(0);
+                initModalFunctionality();
             }
             
             // Event listeners
-            leftArrow.addEventListener('click', prevSlide);
-            rightArrow.addEventListener('click', nextSlide);
+            if (leftArrow) leftArrow.addEventListener('click', prevSlide);
+            if (rightArrow) rightArrow.addEventListener('click', nextSlide);
+            
+            // Keyboard navigation
+            reviewsCarousel.addEventListener('keydown', handleKeyNavigation);
+            reviewsCarousel.setAttribute('tabindex', '0');
+            
+            // Touch events for mobile swipe
+            grid.addEventListener('touchstart', handleTouchStart, { passive: true });
+            grid.addEventListener('touchend', handleTouchEnd, { passive: true });
             
             // Handle window resize
             window.addEventListener('resize', () => {
@@ -640,7 +1016,7 @@
             
             // Initialize the carousel
             init();
-        }); {% endcomment %}
+        });
 
         // Brand Carousel Slider
         document.addEventListener('DOMContentLoaded', function () {
