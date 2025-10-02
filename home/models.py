@@ -436,11 +436,23 @@ class HomePage(Page):
         help_text="Google Maps embed code"
     )
     
+    embed_head_code = models.TextField(
+        blank=True,
+        help_text="Embed any code in <head> (Google Analytics or Microsoft Clarity)"
+    )
+
+    embed_body_code = models.TextField(
+        blank=True,
+        help_text="Embed any code in <body> (Google Tag manager)"
+    )
+
     # Define content panels with organized tabs
     content_panels = Page.content_panels + [
         MultiFieldPanel([
             FieldPanel('show_navigation'),
             FieldPanel('show_footer'),
+            FieldPanel('embed_head_code'),
+            FieldPanel('embed_body_code'),
         ], heading="Page Display Options"),
     ]
     
