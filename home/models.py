@@ -36,6 +36,47 @@ class USPFeature(Orderable):
         FieldPanel('description'),
     ]
 
+class PageSection(Orderable):
+    page = ParentalKey('home.HomePage', related_name='page_sections', on_delete=models.CASCADE)
+    
+    SECTION_CHOICES = [
+        ('hero', 'Hero Section'),
+        ('usp-section', 'USP Features Section'),
+        ('expertise-section', 'Statistics/Expertise Section'),
+        ('partners', 'Partners Section'),
+        ('testimonials', 'Google Reviews Section')
+    ]
+    
+    section_id = models.CharField(
+        max_length=50,
+        choices=SECTION_CHOICES,
+        unique=True,
+        help_text="Select which section this represents"
+    )
+    is_enabled = models.BooleanField(
+        default=True,
+        help_text="Show/hide this section on the page"
+    )
+    
+    panels = [
+        FieldPanel('section_id'),
+        FieldPanel('is_enabled'),
+    ]
+    
+    class Meta:
+        ordering = ['sort_order']  # This comes from Orderable
+        unique_together = ['page', 'section_id']  # Prevent duplicate sections
+    
+    def __str__(self):
+        return f"{self.section_id} ({'Enabled' if self.is_enabled else 'Disabled'})"
+    
+    def save(self, *args, **kwargs):
+        # Auto-populate section_name if not provided
+        if not self.section_id:
+            self.section_id = dict(self.SECTION_CHOICES).get(self.section_id, self.section_id)
+        super().save(*args, **kwargs)
+
+
 
 # Statistics Item Model
 class StatisticItem(Orderable):
@@ -271,10 +312,13 @@ class HomePage(Page):
         default="Your Certified Aircond Supplier in Klang Valley",
         help_text="Main heading displayed in hero section"
     )
-    hero_description = models.TextField(
+    hero_description = RichTextField(
         max_length=800,
         default="We are a certified air conditioning supplier with over 20 years of proven experience. Trusted by residential and commercial clients across Klang Valley area. We offer the lowest pricing without compromising on quality and provide brand-certified systems from all top air conditioner brands. Our solutions guarantee reliability, energy efficiency and long-term value.",
-        help_text="Hero section description text"
+        help_text="Hero section description text",
+        features=[
+            'h2', 'h3', 'h4', 'bold', 'italic', 'ol', 'ul', 'hr', 'link', 'document-link', 'image', 'embed', 'code', 'blockquote'
+        ]
     )
     hero_background_image = models.ForeignKey(
         'wagtailimages.Image',
@@ -448,6 +492,9 @@ class HomePage(Page):
 
     # Define content panels with organized tabs
     content_panels = Page.content_panels + [
+        InlinePanel('page_sections', heading="Page Structure", 
+                   help_text="Sections is structured in order. Uncheck 'is_enabled' to hide sections. Cannot use the same section",
+                   min_num=1),
         MultiFieldPanel([
             FieldPanel('show_navigation'),
             FieldPanel('show_footer'),
@@ -548,6 +595,20 @@ class HomePage(Page):
         ObjectList(contact_panels, heading='Contact'),
         ObjectList(seo_panels, heading='SEO'),
     ])
+
+    def get_ordered_sections(self):
+        """Return sections in the order specified by the user"""
+        return self.page_sections.filter(is_enabled=True).order_by('sort_order')
+
+    def get_section_dict(self):
+        """Return a dictionary mapping section_id to order for use in templates"""
+        sections = {}
+        for i, section in enumerate(self.get_ordered_sections()):
+            sections[section.section_id] = {
+                'order': i,
+                'enabled': section.is_enabled,
+            }
+        return sections
 
 
 
