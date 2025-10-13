@@ -302,6 +302,12 @@
                                 </button>
                             </form>
                         </div>
+                                <!-- Add this where you want the blocks to appear -->
+                        <div class="content-blocks">
+                            {% for block in page.hero_content_blocks %}
+                                {{ block }}
+                            {% endfor %}
+                        </div>
                     </div>
                 </section>
         {% elif section.section_id == 'usp-section' %}
@@ -324,6 +330,12 @@
                 {% endfor %}
             </div>
         </div>
+        <!-- Add this where you want the blocks to appear -->
+            <div class="content-blocks">
+                {% for block in page.usp_content_blocks %}
+                    {{ block }}
+                {% endfor %}
+            </div>
     </section>
 
         {% elif section.section_id == 'expertise-section' %}
@@ -342,6 +354,13 @@
                 {% endfor %}
             </div>
         </div>
+
+        <!-- Add this where you want the blocks to appear -->
+            <div class="content-blocks">
+                {% for block in page.expertise_content_blocks %}
+                    {{ block }}
+                {% endfor %}
+            </div>
     </section>
 
         {% elif section.section_id == 'partners' %}
@@ -365,6 +384,13 @@
             
             <div class="brand-dots"></div>
         </div>
+
+        <!-- Add this where you want the blocks to appear -->
+            <div class="content-blocks">
+                {% for block in page.partners_content_blocks %}
+                    {{ block }}
+                {% endfor %}
+            </div>
         
     </section>
 
@@ -470,9 +496,12 @@
                     {% endfor %}
                 </div>
             </div>
-            <div class="cta-section" style="width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 2rem;">
-            <a href="#home" style="width: 50%;"><button class="cta-button"style="border-radius: 16px !important;">Get Quote</button></a>
-         </div>2
+                    <!-- Add this where you want the blocks to appear -->
+            <div class="content-blocks">
+                {% for block in page.testimonial_content_blocks %}
+                    {{ block }}
+                {% endfor %}
+            </div>
         </div>
     </section>
 

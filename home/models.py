@@ -5,7 +5,10 @@ from wagtail.fields import RichTextField
 from wagtail.images import get_image_model_string
 from wagtail.images.models import Image
 from modelcluster.fields import ParentalKey
-
+from wagtail.fields import StreamField
+from wagtail import blocks
+from wagtail.images.blocks import ImageChooserBlock
+from .blocks import CallToActionBlock
 
 # USP Feature Card Model
 class USPFeature(Orderable):
@@ -86,7 +89,6 @@ class StatisticItem(Orderable):
         help_text="e.g., '3000+', '90%', '4.8+'"
     )
     label = models.CharField(max_length=100)
-    
     panels = [
         FieldPanel('number'),
         FieldPanel('label'),
@@ -490,6 +492,62 @@ class HomePage(Page):
         help_text="Embed any code in <body> (Google Tag manager)"
     )
 
+    # Content blocks here
+    usp_content_blocks = StreamField([
+        ('heading', blocks.CharBlock(classname="title")),
+        ('paragraph', blocks.RichTextBlock()),
+        ('image', ImageChooserBlock()),
+        ('quote', blocks.BlockQuoteBlock()),
+        ('html', blocks.RawHTMLBlock()),
+
+        ('call_to_action', CallToActionBlock()),
+
+    ], blank=True, null=True, use_json_field=True)
+
+    # Content blocks here
+    hero_content_blocks = StreamField([
+        ('heading', blocks.CharBlock(classname="title")),
+        ('paragraph', blocks.RichTextBlock()),
+        ('image', ImageChooserBlock()),
+        ('quote', blocks.BlockQuoteBlock()),
+        ('html', blocks.RawHTMLBlock()),
+
+        ('call_to_action', CallToActionBlock()),
+    ], blank=True, null=True, use_json_field=True)
+
+    # Content blocks here
+    expertise_content_blocks = StreamField([
+        ('heading', blocks.CharBlock(classname="title")),
+        ('paragraph', blocks.RichTextBlock()),
+        ('image', ImageChooserBlock()),
+        ('quote', blocks.BlockQuoteBlock()),
+        ('html', blocks.RawHTMLBlock()),
+
+        ('call_to_action', CallToActionBlock()),
+    ], blank=True, null=True, use_json_field=True)
+
+    # Content blocks here
+    partners_content_blocks = StreamField([
+        ('heading', blocks.CharBlock(classname="title")),
+        ('paragraph', blocks.RichTextBlock()),
+        ('image', ImageChooserBlock()),
+        ('quote', blocks.BlockQuoteBlock()),
+        ('html', blocks.RawHTMLBlock()),
+
+        ('call_to_action', CallToActionBlock()),
+    ], blank=True, null=True, use_json_field=True)
+
+    # Content blocks here
+    testimonial_content_blocks = StreamField([
+        ('heading', blocks.CharBlock(classname="title")),
+        ('paragraph', blocks.RichTextBlock()),
+        ('image', ImageChooserBlock()),
+        ('quote', blocks.BlockQuoteBlock()),
+        ('html', blocks.RawHTMLBlock()),
+
+        ('call_to_action', CallToActionBlock()),
+    ], blank=True, null=True, use_json_field=True)
+
     # Define content panels with organized tabs
     content_panels = Page.content_panels + [
         InlinePanel('page_sections', heading="Page Structure", 
@@ -516,6 +574,7 @@ class HomePage(Page):
             FieldPanel('form_whatsapp_message_template'),
             FieldPanel('form_success_message'),
         ], heading="WhatsApp Contact Form"),
+        FieldPanel('hero_content_blocks')
     ]
     
     services_panels = [
@@ -524,6 +583,7 @@ class HomePage(Page):
             FieldPanel('services_subtitle'),
         ], heading="Services Section"),
         InlinePanel('usp_features', heading="USP Features", min_num=1),
+        FieldPanel('usp_content_blocks'),
     ]
     
     stats_panels = [
@@ -532,6 +592,7 @@ class HomePage(Page):
             FieldPanel('stats_subtitle'),
         ], heading="Statistics Section"),
         InlinePanel('statistics', heading="Statistics", min_num=1),
+        FieldPanel('expertise_content_blocks'),
     ]
     
     partners_panels = [
@@ -541,6 +602,7 @@ class HomePage(Page):
             # InlinePanel('home_images', label="Home Images"),
         ], heading="Partners Section"),
         InlinePanel('brand_partners', heading="Brand Partners", min_num=1),
+        FieldPanel('partners_content_blocks'),
     ]
     
     testimonials_panels = [
@@ -555,6 +617,7 @@ class HomePage(Page):
             FieldPanel('google_widget_url'),
         ], heading="Google Review Widget"),
         InlinePanel('google_reviews', heading="Google Reviews", min_num=1),
+        FieldPanel('testimonial_content_blocks'),
     ]
     
     contact_panels = [
