@@ -1,5 +1,5 @@
 from django.db import models
-from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel, TabbedInterface, ObjectList
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel, TabbedInterface, ObjectList, FieldRowPanel
 from wagtail.models import Page, Orderable
 from wagtail.fields import RichTextField
 from wagtail.images import get_image_model_string
@@ -9,6 +9,7 @@ from wagtail.fields import StreamField
 from wagtail import blocks
 from wagtail.images.blocks import ImageChooserBlock
 from .blocks import CallToActionBlock
+
 
 # USP Feature Card Model
 class USPFeature(Orderable):
@@ -282,6 +283,13 @@ class HomePage(Page):
     # Ensure only one home page can be created
     max_count = 1
     
+    parent_page_types = [
+        'wagtailcore.Page'  # Can only be created under the root page
+    ]
+
+    subpage_types = [
+        'contact.ContactPage'
+    ]
     # Page Display Options
     show_navigation = models.BooleanField(
         "Show Navigation Bar",
