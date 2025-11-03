@@ -78,6 +78,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "wagtail.contrib.settings.context_processors.settings",
             ],
         },
     },
@@ -189,6 +190,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 465
 EMAIL_HOST_USER = 'info@sengleongaircond.com.my.'
-EMAIL_HOST_PASSWORD = 'krepmwxdivwqhctz'
+EMAIL_HOST_PASSWORD = 'Sena4455Wh'
 DEFAULT_FROM_EMAIL ='info@sengleongaircond.com.my.'
 EMAIL_TO = 'contact.whisttle@gmail.com'

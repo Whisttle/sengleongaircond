@@ -8,6 +8,7 @@ from wagtail.documents import urls as wagtaildocs_urls
 
 from search import views as search_views
 from wagtail_favicon.urls import urls as favicon_urls
+from home import views as home_views
 
 urlpatterns = [
     path("django-admin/", admin.site.urls),
@@ -15,6 +16,7 @@ urlpatterns = [
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
     path('', include(favicon_urls)),
+    path("api/contact/submit/", home_views.submit_contact_form, name="submit_contact_form"),
 ]
 
 

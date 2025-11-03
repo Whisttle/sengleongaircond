@@ -275,6 +275,8 @@
                             <!-- Message Display -->
                             <div class="message" id="form-message" style="display: none; padding: 15px; border-radius: 8px; margin: 20px 0;"></div>
                             
+                            {% if page.form_submission_method == 'whatsapp' %}
+                            <!-- WhatsApp Form (JavaScript handled) -->
                             <form id="quote-form" itemscope itemtype="https://schema.org/ContactPoint">
                                 <div class="form-row">
                                     <div class="form-group form-half">
@@ -301,6 +303,266 @@
                                     <span id="button-text">Get Free Quote Now</span>
                                 </button>
                             </form>
+                            
+                            {% else %}
+                            <!-- Email Form (Wagtail handled) -->
+                            <form action="{% pageurl page %}" method="POST" id="email-form" class="wagtail-email-form" itemscope itemtype="https://schema.org/ContactPoint">
+                                {% csrf_token %}
+                                
+                                {% for field in form %}
+                                    {% if forloop.counter <= 2 %}
+                                        {% if forloop.first %}
+                                        <div class="form-row">
+                                        {% endif %}
+                                            <div class="form-group form-half {% if field.field.required %}required{% endif %}">
+                                                {% if field.field.widget.input_type == 'textarea' %}
+                                                    <textarea 
+                                                        name="{{ field.name }}" 
+                                                        id="id_{{ field.name }}"
+                                                        class="form-input" 
+                                                        placeholder="{{ field.label }}{% if field.field.required %} *{% endif %}"
+                                                        rows="6"
+                                                        {% if field.field.required %}required{% endif %}
+                                                    >{{ field.value|default:'' }}</textarea>
+                                                {% elif field.field.widget.input_type == 'checkbox' or field.field.widget.input_type == 'radio' %}
+                                                    <label class="checkbox-label">
+                                                        <input 
+                                                            type="{{ field.field.widget.input_type }}" 
+                                                            name="{{ field.name }}" 
+                                                            id="id_{{ field.name }}"
+                                                            {% if field.value %}checked{% endif %}
+                                                            {% if field.field.required %}required{% endif %}
+                                                        >
+                                                        <span>{{ field.label }}{% if field.field.required %} *{% endif %}</span>
+                                                    </label>
+                                                {% elif field.field.widget.input_type == 'select' %}
+                                                    <select 
+                                                        name="{{ field.name }}" 
+                                                        id="id_{{ field.name }}"
+                                                        class="form-input"
+                                                        {% if field.field.required %}required{% endif %}
+                                                    >
+                                                        <option value="">{{ field.label }}{% if field.field.required %} *{% endif %}</option>
+                                                        {% for choice in field.field.choices %}
+                                                        <option value="{{ choice.0 }}" {% if choice.0 == field.value %}selected{% endif %}>{{ choice.1 }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                {% else %}
+                                                    <input 
+                                                        type="{{ field.field.widget.input_type|default:'text' }}" 
+                                                        name="{{ field.name }}" 
+                                                        id="id_{{ field.name }}"
+                                                        class="form-input" 
+                                                        placeholder="{{ field.label }}{% if field.field.required %} *{% endif %}"
+                                                        value="{{ field.value|default:'' }}"
+                                                        {% if field.field.required %}required{% endif %}
+                                                    >
+                                                {% endif %}
+                                                
+                                                {% if field.errors %}
+                                                <div class="form-error">
+                                                    {% for error in field.errors %}
+                                                    <span class="error-message">{{ error }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                                
+                                                {% if field.help_text %}
+                                                <small class="form-help-text">{{ field.help_text }}</small>
+                                                {% endif %}
+                                            </div>
+                                        {% if forloop.counter == 2 %}
+                                        </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="form-group {% if field.field.required %}required{% endif %}">
+                                            {% if field.field.widget.input_type == 'textarea' %}
+                                                <textarea 
+                                                    name="{{ field.name }}" 
+                                                    id="id_{{ field.name }}"
+                                                    class="form-input" 
+                                                    placeholder="{{ field.label }}{% if field.field.required %} *{% endif %}"
+                                                    rows="6"
+                                                    {% if field.field.required %}required{% endif %}
+                                                >{{ field.value|default:'' }}</textarea>
+                                            {% elif field.field.widget.input_type == 'checkbox' or field.field.widget.input_type == 'radio' %}
+                                                <label class="checkbox-label">
+                                                    <input 
+                                                        type="{{ field.field.widget.input_type }}" 
+                                                        name="{{ field.name }}" 
+                                                        id="id_{{ field.name }}"
+                                                        {% if field.value %}checked{% endif %}
+                                                        {% if field.field.required %}required{% endif %}
+                                                    >
+                                                    <span>{{ field.label }}{% if field.field.required %} *{% endif %}</span>
+                                                </label>
+                                            {% elif field.field.widget.input_type == 'select' %}
+                                                <select 
+                                                    name="{{ field.name }}" 
+                                                    id="id_{{ field.name }}"
+                                                    class="form-input"
+                                                    {% if field.field.required %}required{% endif %}
+                                                >
+                                                    <option value="">{{ field.label }}{% if field.field.required %} *{% endif %}</option>
+                                                    {% for choice in field.field.choices %}
+                                                    <option value="{{ choice.0 }}" {% if choice.0 == field.value %}selected{% endif %}>{{ choice.1 }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            {% else %}
+                                                <input 
+                                                    type="{{ field.field.widget.input_type|default:'text' }}" 
+                                                    name="{{ field.name }}" 
+                                                    id="id_{{ field.name }}"
+                                                    class="form-input" 
+                                                    placeholder="{{ field.label }}{% if field.field.required %} *{% endif %}"
+                                                    value="{{ field.value|default:'' }}"
+                                                    {% if field.field.required %}required{% endif %}
+                                                >
+                                            {% endif %}
+                                            
+                                            {% if field.errors %}
+                                            <div class="form-error">
+                                                {% for error in field.errors %}
+                                                <span class="error-message">{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            
+                                            {% if field.help_text %}
+                                            <small class="form-help-text">{{ field.help_text }}</small>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if form.non_field_errors %}
+                                <div class="form-error">
+                                    {% for error in form.non_field_errors %}
+                                    <span class="error-message">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                
+                                <button type="submit" class="cta-button">
+                                    Get Free Quote Now
+                                </button>
+                            </form>
+                            
+                            <style>
+                                /* Wagtail Email Form Styling */
+                                .wagtail-email-form .form-group {
+                                    margin-bottom: 20px;
+                                }
+                                
+                                .wagtail-email-form .form-input {
+                                    width: 100%;
+                                    padding: 15px;
+                                    border: 2px solid #e0e0e0;
+                                    border-radius: 8px;
+                                    font-size: 16px;
+                                    transition: all 0.3s ease;
+                                    font-family: 'Inter', Arial, sans-serif;
+                                    background: #ffffff;
+                                    color: #333;
+                                    box-sizing: border-box;
+                                }
+                                
+                                .wagtail-email-form .form-input:focus {
+                                    outline: none;
+                                    border-color: #0097a7;
+                                    box-shadow: 0 0 0 3px rgba(0, 151, 167, 0.1);
+                                }
+                                
+                                .wagtail-email-form .form-input::placeholder {
+                                    color: #999;
+                                }
+                                
+                                .wagtail-email-form textarea.form-input {
+                                    resize: vertical;
+                                    min-height: 100px;
+                                }
+                                
+                                .wagtail-email-form select.form-input {
+                                    cursor: pointer;
+                                    appearance: none;
+                                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+                                    background-repeat: no-repeat;
+                                    background-position: right 15px center;
+                                    padding-right: 40px;
+                                }
+                                
+                                .wagtail-email-form .checkbox-label {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 10px;
+                                    cursor: pointer;
+                                    font-size: 16px;
+                                    color: #333;
+                                }
+                                
+                                .wagtail-email-form .checkbox-label input[type="checkbox"],
+                                .wagtail-email-form .checkbox-label input[type="radio"] {
+                                    width: 20px;
+                                    height: 20px;
+                                    cursor: pointer;
+                                    accent-color: #0097a7;
+                                }
+                                
+                                .wagtail-email-form .form-error {
+                                    margin-top: 5px;
+                                    margin-bottom: 15px;
+                                }
+                                
+                                .wagtail-email-form .error-message {
+                                    display: block;
+                                    color: #d32f2f;
+                                    font-size: 14px;
+                                    margin-top: 5px;
+                                    padding: 8px 12px;
+                                    background: #ffebee;
+                                    border-left: 3px solid #d32f2f;
+                                    border-radius: 4px;
+                                }
+                                
+                                .wagtail-email-form .form-help-text {
+                                    display: block;
+                                    margin-top: 5px;
+                                    font-size: 13px;
+                                    color: #666;
+                                    font-style: italic;
+                                }
+                                
+                                .form-input:invalid {
+                               
+                                }
+                                
+                                .wagtail-email-form .required .form-input:valid {
+                                    border-color: #4caf50;
+                                }
+                                
+                                /* Match the hero form styling */
+                                .wagtail-email-form .form-input {
+                                    background: #f9fafb;
+                                }
+                                
+                                .wagtail-email-form .form-input:hover {
+                                    border-color: #b0bec5;
+                                    background: #ffffff;
+                                }
+                                
+                                /* Responsive adjustments */
+                                @media (max-width: 768px) {
+                                    .wagtail-email-form .form-input {
+                                        font-size: 14px;
+                                        padding: 12px;
+                                    }
+                                    
+                                    .wagtail-email-form .checkbox-label {
+                                        font-size: 14px;
+                                    }
+                                }
+                            </style>
+                            {% endif %}
                         </div>
                                 <!-- Add this where you want the blocks to appear -->
                         <div class="content-blocks">
@@ -544,7 +806,7 @@
 {% endfor %}
     {% endblock content %}
     <script>
-        // WhatsApp Form Handler Class
+      // WhatsApp Form Handler Class
         class WhatsAppFormHandler {
             constructor() {
                 this.form = document.getElementById('quote-form');
@@ -1472,6 +1734,7 @@
         });
 
 
+      
 
 
     </script>

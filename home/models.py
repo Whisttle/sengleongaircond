@@ -8,9 +8,50 @@ from modelcluster.fields import ParentalKey
 from wagtail.fields import StreamField
 from wagtail import blocks
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.contrib.forms.models import AbstractEmailForm, AbstractFormField
+from wagtail.contrib.forms.panels import FormSubmissionsPanel
+from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 from .blocks import CallToActionBlock
 
 
+# Webhook Settings - Editable from Wagtail Admin
+@register_setting
+class WebhookSettings(BaseSiteSetting):
+    """
+    Webhook configuration for form submissions
+    Accessible in Wagtail Admin under Settings > Webhook Settings
+    """
+    zapier_webhook_url = models.URLField(
+        blank=True,
+        default="https://hooks.zapier.com/hooks/catch/530937/ur7g2ql/",
+        help_text="Zapier webhook URL to send form submissions to. Leave blank to disable Zapier integration."
+    )
+    
+    webhook_enabled = models.BooleanField(
+        default=True,
+        help_text="Enable or disable sending data to the webhook"
+    )
+    
+    panels = [
+        MultiFieldPanel([
+            FieldPanel('webhook_enabled'),
+            FieldPanel('zapier_webhook_url'),
+        ], heading="Zapier Webhook Configuration"),
+    ]
+    
+    class Meta:
+        verbose_name = "Webhook Settings"
+
+
+# Form Field for HomePage Contact Form
+class HomePageFormField(AbstractFormField):
+    page = ParentalKey(
+        'HomePage',
+        on_delete=models.CASCADE,
+        related_name='form_fields'
+    )
+
+ 
 # USP Feature Card Model
 class USPFeature(Orderable):
     page = ParentalKey('home.HomePage', related_name='usp_features', on_delete=models.CASCADE)
@@ -279,7 +320,109 @@ class GoogleReview(Orderable):
         return f"{self.name} - {self.rating} stars ({self.review_source})"
 
 
-class HomePage(Page):
+# Thank You Page Settings Model
+class ThankYouPageSettings(Orderable):
+    page = ParentalKey('home.HomePage', related_name='thank_you_settings', on_delete=models.CASCADE)
+    
+    # Thank You Container Content
+    thank_you_title = models.CharField(
+        max_length=100,
+        default="Thank You!",
+        help_text="Main title displayed on thank you page"
+    )
+    thank_you_message = models.TextField(
+        max_length=500,
+        default="Your inquiry has been successfully submitted. We've received your message and will get back to you as soon as possible.",
+        help_text="Main thank you message"
+    )
+    
+    # Info Box Content (Rich Text)
+    info_box_title = models.CharField(
+        max_length=100,
+        default="What Happens Next?",
+        help_text="Title for the information box"
+    )
+    info_box_content = RichTextField(
+        default="<p>✓ We'll review your inquiry within 24 hours</p><p>✓ Our team will contact you via email or phone</p><p>✓ We'll provide a detailed quote and answer all your questions</p>",
+        help_text="Rich text content for the information box",
+        features=[
+            'h2', 'h3', 'h4', 'bold', 'italic', 'ol', 'ul', 'hr', 'link', 'code'
+        ]
+    )
+    
+    # Button Settings
+    home_button_text = models.CharField(
+        max_length=50,
+        default="Back to Home",
+        help_text="Text for the home button"
+    )
+    submit_another_button_text = models.CharField(
+        max_length=50,
+        default="Submit Another Inquiry",
+        help_text="Text for the submit another inquiry button"
+    )
+    
+    # Contact Section
+    contact_section_title = models.CharField(
+        max_length=100,
+        default="Need Immediate Assistance?",
+        help_text="Title for the contact section"
+    )
+    phone_link_text = models.CharField(
+        max_length=50,
+        default="Call Us",
+        blank=True,
+        help_text="Text for the phone link (Phone number us phone primary)"
+    )
+    whatsapp_link_text = models.CharField(
+        max_length=50,
+        default="WhatsApp Us",
+        blank=True,
+        help_text="Text for the WhatsApp link (phone URL uses whatsapp number)"
+    )
+    
+    # Display Options
+    show_info_box = models.BooleanField(
+        default=True,
+        help_text="Show the information box on thank you page"
+    )
+    show_contact_section = models.BooleanField(
+        default=True,
+        help_text="Show the contact section on thank you page"
+    )
+    
+    panels = [
+        MultiFieldPanel([
+            FieldPanel('thank_you_title'),
+            FieldPanel('thank_you_message'),
+        ], heading="Thank You Content"),
+        MultiFieldPanel([
+            FieldPanel('show_info_box'),
+            FieldPanel('info_box_title'),
+            FieldPanel('info_box_content'),
+        ], heading="Information Box"),
+        MultiFieldPanel([
+            FieldPanel('home_button_text'),
+            FieldPanel('submit_another_button_text'),
+        ], heading="Button Settings"),
+        MultiFieldPanel([
+            FieldPanel('show_contact_section'),
+            FieldPanel('contact_section_title'),
+            FieldPanel('phone_link_text'),
+            FieldPanel('whatsapp_link_text'),
+        ], heading="Contact Section"),
+    ]
+    
+    class Meta:
+        ordering = ['sort_order']
+        verbose_name = "Thank You Page Settings"
+        verbose_name_plural = "Thank You Page Settings"
+    
+    def __str__(self):
+        return f"Thank You Settings - {self.thank_you_title}"
+
+
+class HomePage(AbstractEmailForm):
     # Ensure only one home page can be created
     max_count = 1
     
@@ -350,6 +493,19 @@ class HomePage(Page):
         default="Contact us today for professional air conditioning supply in Klang Valley",
         help_text="Subtitle for the contact form"
     )
+    
+    # Form Submission Method Toggle
+    form_submission_method = models.CharField(
+        max_length=20,
+        choices=[
+            ('whatsapp', 'WhatsApp (JavaScript redirect)'),
+            ('email', 'Email (Wagtail form submission)'),
+        ],
+        default='email',
+        help_text="Choose how form submissions should be handled. WhatsApp will redirect users to WhatsApp with pre-filled message. Email will save submissions and send via Mailtrap."
+    )
+    
+    # WhatsApp Settings (only used if form_submission_method = 'whatsapp')
     form_whatsapp_number = models.CharField(
         max_length=20,
         default="60122992909",
@@ -359,7 +515,7 @@ class HomePage(Page):
         default="Hi! I'm interested in getting a quote for air conditioning service.\n\n*Name:* {name}\n*Email:* {email}\n*Phone:* {phone}\n*Budget:* {budget}\n*Location:* {location}\n*Requirements:* {message}\n\nPlease contact me for a free quote. Thank you!",
         help_text="WhatsApp message template. Use {name}, {email}, {phone}, {budget}, {location}, {message} as placeholders"
     )
-    form_success_message = models.CharField(
+    form_whatsapp_success_message = models.CharField(
         max_length=300,
         default="Redirecting to WhatsApp to send your inquiry...",
         help_text="Success message shown before redirecting to WhatsApp"
@@ -578,10 +734,26 @@ class HomePage(Page):
         MultiFieldPanel([
             FieldPanel('form_title'),
             FieldPanel('form_subtitle'),
+            FieldPanel('form_submission_method'),
+        ], heading="Contact Form Settings"),
+        InlinePanel('form_fields', heading="Form Fields", 
+                   help_text="Add form fields for the contact form (only used when Email method is selected)"),
+        MultiFieldPanel([
             FieldPanel('form_whatsapp_number'),
             FieldPanel('form_whatsapp_message_template'),
-            FieldPanel('form_success_message'),
-        ], heading="WhatsApp Contact Form"),
+            FieldPanel('form_whatsapp_success_message'),
+        ], heading="WhatsApp Settings (only used when WhatsApp method is selected)"),
+        MultiFieldPanel([
+            FieldRowPanel([
+                FieldPanel('from_address', classname='col6'),
+                FieldPanel('to_address', classname='col6'),
+            ]),
+            FieldPanel('subject'),
+        ], heading="Email Settings (only used when Email method is selected)"),
+        FormSubmissionsPanel(),
+        InlinePanel('thank_you_settings', heading="Thank You Page Settings", 
+                   help_text="Customize the thank you page content and layout", 
+                   max_num=1),
         FieldPanel('hero_content_blocks')
     ]
     
@@ -678,8 +850,280 @@ class HomePage(Page):
             sections[section.section_id] = {
                 'order': i,
                 'enabled': section.is_enabled,
+                'name': section.section_name
             }
         return sections
+    
+    def get_thank_you_settings(self):
+        """Return the thank you page settings or create default settings"""
+        settings = self.thank_you_settings.first()
+        if not settings:
+            # Create default settings if none exist
+            settings = ThankYouPageSettings(
+                page=self,
+                thank_you_title="Thank You!",
+                thank_you_message="Your inquiry has been successfully submitted. We've received your message and will get back to you as soon as possible.",
+                info_box_title="What Happens Next?",
+                info_box_content="<p>✓ We'll review your inquiry within 24 hours</p><p>✓ Our team will contact you via email or phone</p><p>✓ We'll provide a detailed quote and answer all your questions</p>",
+                home_button_text="Back to Home",
+                submit_another_button_text="Submit Another Inquiry",
+                contact_section_title="Need Immediate Assistance?",
+                phone_link_text="Call Us",
+                whatsapp_link_text="WhatsApp Us",
+                show_info_box=True,
+                show_contact_section=True
+            )
+        return settings
+    
+    def serve(self, request, *args, **kwargs):
+        """
+        Override serve to handle form submissions based on the selected method.
+        If WhatsApp is selected, render the page normally (JavaScript handles submission).
+        If Email is selected, use Wagtail's built-in email form handling and send via Mailtrap.
+        """
+        from django.shortcuts import render
+        from django.conf import settings
+        from decouple import config
+        import mailtrap as mt
+        
+        # If form submission method is WhatsApp, just render the page
+        # JavaScript will handle the form submission
+        if self.form_submission_method == 'whatsapp':
+            return super(AbstractEmailForm, self).serve(request, *args, **kwargs)
+        
+        # If form submission method is Email, handle it with Wagtail's form system
+        if request.method == 'POST':
+            form = self.get_form(request.POST, page=self, user=request.user)
+            
+            if form.is_valid():
+                # Save the form submission to database
+                form_submission = self.process_form_submission(form)
+                
+                # Send to Zapier webhook
+                try:
+                    # pass the request so site-specific settings can be resolved
+                    self.send_to_zapier_webhook(form, request=request)
+                except Exception as e:
+                    # Log the error but don't fail the submission
+                    print(f"Error sending to Zapier webhook: {str(e)}")
+                
+                # Send email via Mailtrap
+                try:
+                    self.send_via_mailtrap(form)
+                except Exception as e:
+                    # Log the error but don't fail the submission
+                    print(f"Error sending email via Mailtrap: {str(e)}")
+                
+                # Render the thank you page
+                return self.render_landing_page(request, form_submission, *args, **kwargs)
+        else:
+            form = self.get_form(page=self, user=request.user)
+        
+        context = self.get_context(request)
+        context['form'] = form
+        return render(request, self.get_template(request), context)
+    
+    def send_to_zapier_webhook(self, form, request=None):
+        """
+        Send form submission to Zapier webhook.
+
+        Tries to resolve `WebhookSettings` using the provided `request` (recommended).
+        Falls back to resolving settings from the page's site when request is not
+        available. If settings are missing or disabled, the method returns silently.
+        """
+        import requests
+        from django.utils import timezone
+
+        # Resolve webhook settings. Prefer request (site-aware), fall back to page site.
+        webhook_settings = None
+        try:
+            if request is not None:
+                webhook_settings = WebhookSettings.for_request(request)
+            else:
+                site = self.get_site()
+                if site is not None:
+                    webhook_settings = WebhookSettings.for_site(site)
+        except Exception:
+            # If settings can't be resolved, leave webhook_settings as None
+            webhook_settings = None
+
+        # Check if webhook is enabled and URL is configured
+        if not webhook_settings or not getattr(webhook_settings, 'webhook_enabled', False) or not getattr(webhook_settings, 'zapier_webhook_url', ''):
+            # Nothing to do - Zapier integration disabled or not configured
+            print("Zapier webhook is disabled or URL not configured for this site")
+            return None
+
+        # Collect form data
+        form_data = {
+            'form type' : 'contact',
+            'source': 'Seng Leong Engineering Website'
+        }
+
+        # Add all form fields
+        for field in self.form_fields.all():
+            field_key = field.clean_name
+            field_value = form.cleaned_data.get(field_key, '')
+            form_data[field.label] = field_value
+
+        # Send POST request to Zapier webhook
+        response = requests.post(
+            webhook_settings.zapier_webhook_url,
+            json=form_data,
+            headers={'Content-Type': 'application/json'},
+            timeout=10
+        )
+
+        # Raise exception if request failed
+        response.raise_for_status()
+
+        return response
+    
+    def send_via_mailtrap(self, form):
+        """
+        Send form submission via Mailtrap SDK
+        """
+        from decouple import config
+        import mailtrap as mt
+        from django.utils import timezone
+        
+        # Get Mailtrap API token from environment
+        api_token = config('MAILTRAP_API_TOKEN', default='')
+        if not api_token:
+            raise ValueError("MAILTRAP_API_TOKEN not configured in .env file")
+        
+        # Collect form data - iterate through the page's form fields
+        form_data = {}
+        for field in self.form_fields.all():
+            # Get the field's clean_name which is used as the form field key
+            field_key = field.clean_name
+            # Get the value from cleaned_data
+            field_value = form.cleaned_data.get(field_key, '')
+            # Use the label as the display name
+            form_data[field.label] = field_value
+        
+        # Create HTML email content
+        html_content = self.generate_email_html(form_data)
+        text_content = self.generate_email_text(form_data)
+        
+        # Initialize Mailtrap client
+        client = mt.MailtrapClient(token=api_token)
+        
+        # Create the email
+        mail = mt.Mail(
+            sender=mt.Address(email=self.from_address or "noreply@sengleongaircond.com.my", name="Seng Leong Website"),
+            to=[mt.Address(email=self.to_address)],
+            subject=self.subject or f"New Contact Form Submission from {form_data.get('Name', 'Website')}",
+            text=text_content,
+            html=html_content,
+            category="Contact Form Submission"
+        )
+        
+        # Send the email
+        client.send(mail)
+    
+    def generate_email_html(self, form_data):
+        """Generate beautiful HTML email template"""
+        from django.utils import timezone
+        
+        fields_html = ""
+        for field_name, field_value in form_data.items():
+            if field_value:
+                fields_html += f"""
+                <div class="field">
+                    <div class="label">{field_name}:</div>
+                    <div class="value">{field_value}</div>
+                </div>
+                """
+        
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }}
+                .header {{
+                    background: linear-gradient(135deg, #1a237e 0%, #0097a7 100%);
+                    color: white;
+                    padding: 30px;
+                    text-align: center;
+                    border-radius: 10px 10px 0 0;
+                }}
+                .content {{
+                    background: #f9f9f9;
+                    padding: 30px;
+                    border: 1px solid #ddd;
+                }}
+                .field {{
+                    margin: 15px 0;
+                    padding: 15px;
+                    background: white;
+                    border-left: 4px solid #0097a7;
+                    border-radius: 4px;
+                }}
+                .label {{
+                    font-weight: bold;
+                    color: #1a237e;
+                    margin-bottom: 5px;
+                    text-transform: capitalize;
+                }}
+                .value {{
+                    color: #555;
+                }}
+                .footer {{
+                    background: #1a237e;
+                    color: white;
+                    padding: 20px;
+                    text-align: center;
+                    border-radius: 0 0 10px 10px;
+                    font-size: 12px;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1 style="margin: 0;">New Contact Form Submission</h1>
+                <p style="margin: 10px 0 0 0;">from Seng Leong Engineering Website</p>
+            </div>
+            
+            <div class="content">
+                {fields_html}
+                
+                <div class="field">
+                    <div class="label">Submitted At:</div>
+                    <div class="value">{timezone.now().strftime('%d %B %Y, %I:%M %p %Z')}</div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>This email was sent from the contact form on sengleongaircond.com</p>
+                <p>Seng Leong Engineering Sdn Bhd - Air Conditioning Services Klang Valley</p>
+            </div>
+        </body>
+        </html>
+        """
+        return html
+    
+    def generate_email_text(self, form_data):
+        """Generate plain text email"""
+        from django.utils import timezone
+        
+        text = "NEW CONTACT FORM SUBMISSION\n\n"
+        for field_name, field_value in form_data.items():
+            if field_value:
+                text += f"{field_name}: {field_value}\n"
+        
+        text += f"\nSubmitted at: {timezone.now().strftime('%d %B %Y, %I:%M %p %Z')}\n"
+        text += "\n---\nThis email was sent from the contact form on sengleongaircond.com\n"
+        text += "Seng Leong Engineering Sdn Bhd\n"
+        
+        return text
 
 
 
