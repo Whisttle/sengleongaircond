@@ -151,7 +151,10 @@ def submit_contact_form(request):
         </body>
         </html>
         """
-        
+        budget_text = f"Budget: {budget}" if budget else ""
+
+        message_text = f"Additional Message:\n{message}" if message else ""
+
         # Plain text version for email clients that don't support HTML
         text_content = f"""
         NEW QUOTE REQUEST
@@ -161,10 +164,11 @@ def submit_contact_form(request):
         Email: {email}
         Phone: {phone}
         Location: {location}
-        {'Budget: ' + budget if budget else ''}
-        
-        {'Additional Message:\n' + message if message else ''}
-        
+        Budget: {budget_text}
+
+        Additional Message: 
+        {message_text}
+                
         Submitted at: {timezone.now().strftime('%d %B %Y, %I:%M %p %Z')}
         
         ---
