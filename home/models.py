@@ -505,6 +505,13 @@ class HomePage(AbstractEmailForm):
         help_text="Choose how form submissions should be handled. WhatsApp will redirect users to WhatsApp with pre-filled message. Email will save submissions and send via Mailtrap."
     )
     
+    # Email Sender Settings
+    email_sender_name = models.CharField(
+        max_length=100,
+        default="Seng Leong Website",
+        help_text="Name displayed as the email sender (e.g., 'Seng Leong Website', 'Company Name')"
+    )
+    
     # WhatsApp Settings (only used if form_submission_method = 'whatsapp')
     form_whatsapp_number = models.CharField(
         max_length=20,
@@ -735,6 +742,7 @@ class HomePage(AbstractEmailForm):
             FieldPanel('form_title'),
             FieldPanel('form_subtitle'),
             FieldPanel('form_submission_method'),
+            FieldPanel('email_sender_name'),
         ], heading="Contact Form Settings"),
         InlinePanel('form_fields', heading="Form Fields", 
                    help_text="Add form fields for the contact form (only used when Email method is selected)"),
@@ -1036,7 +1044,10 @@ class HomePage(AbstractEmailForm):
         
         # Create the email
         mail = mt.Mail(
-            sender=mt.Address(email=self.from_address or "noreply@sengleongaircond.com.my", name="Seng Leong Website"),
+            sender=mt.Address(
+                email=self.from_address or "noreply@sengleongaircond.com.my", 
+                name=self.email_sender_name or "Seng Leong Website"
+            ),
             to=recipient_addresses,
             subject=self.subject or f"New Contact Form Submission from {form_data.get('Name', 'Website')}",
             text=text_content,
