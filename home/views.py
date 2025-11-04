@@ -178,10 +178,10 @@ def submit_contact_form(request):
         
         # Initialize Mailtrap client
         client = MailtrapClient(token=api_token)
-        
+
         # Create the email
         mail = Mail(
-            sender=Address(email="noreply@sengleongaircond.com", name="Seng Leong Website"),
+            sender=Address(email="noreply@sengleongaircond.com.my", name="Seng Leong Website"),
             to=[Address(email=recipient_email)],
             subject=f"New Quote Request from {name} - {location}",
             text=text_content,
@@ -192,6 +192,7 @@ def submit_contact_form(request):
         # Send the email
         response = client.send(mail)
         
+        print(response)
         return JsonResponse({
             'success': True,
             'message': 'Thank you! Your inquiry has been sent successfully. We will get back to you soon.'

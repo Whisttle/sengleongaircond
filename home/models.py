@@ -875,11 +875,33 @@ class HomePage(AbstractEmailForm):
             )
         return settings
     
+    def process_form_submission(self, form):
+        """
+        Override AbstractEmailForm's process_form_submission to save submission 
+        WITHOUT sending Wagtail's default plain text email.
+        
+        This prevents duplicate emails. We only send the custom HTML email via 
+        Mailtrap in the send_via_mailtrap() method which is called from serve().
+        
+        Returns:
+            FormSubmission object that was saved to the database
+        """
+        # Save the form submission to database
+        form_submission = self.get_submission_class().objects.create(
+            form_data=form.cleaned_data,
+            page=self,
+        )
+        
+        # IMPORTANT: Do NOT call send_mail() here
+        # This prevents Wagtail from sending its default plain text email
+        # We handle email sending with our custom HTML email via Mailtrap instead
+        return form_submission
+    
     def serve(self, request, *args, **kwargs):
         """
         Override serve to handle form submissions based on the selected method.
         If WhatsApp is selected, render the page normally (JavaScript handles submission).
-        If Email is selected, use Wagtail's built-in email form handling and send via Mailtrap.
+        If Email is selected, save submission to database and send HTML email via Mailtrap only.
         """
         from django.shortcuts import render
         from django.conf import settings
@@ -891,12 +913,12 @@ class HomePage(AbstractEmailForm):
         if self.form_submission_method == 'whatsapp':
             return super(AbstractEmailForm, self).serve(request, *args, **kwargs)
         
-        # If form submission method is Email, handle it with Wagtail's form system
+        # If form submission method is Email, handle it with custom logic
         if request.method == 'POST':
             form = self.get_form(request.POST, page=self, user=request.user)
             
             if form.is_valid():
-                # Save the form submission to database
+                # Save the form submission to database (without sending Wagtail's email)
                 form_submission = self.process_form_submission(form)
                 
                 # Send to Zapier webhook
