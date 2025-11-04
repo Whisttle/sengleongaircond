@@ -1008,10 +1008,14 @@ class HomePage(AbstractEmailForm):
         # Initialize Mailtrap client
         client = mt.MailtrapClient(token=api_token)
         
+        # Parse recipient emails (handle comma-separated emails)
+        recipient_emails = [email.strip() for email in self.to_address.split(',') if email.strip()]
+        recipient_addresses = [mt.Address(email=email) for email in recipient_emails]
+        
         # Create the email
         mail = mt.Mail(
             sender=mt.Address(email=self.from_address or "noreply@sengleongaircond.com.my", name="Seng Leong Website"),
-            to=[mt.Address(email=self.to_address)],
+            to=recipient_addresses,
             subject=self.subject or f"New Contact Form Submission from {form_data.get('Name', 'Website')}",
             text=text_content,
             html=html_content,
