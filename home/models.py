@@ -23,7 +23,7 @@ class WebhookSettings(BaseSiteSetting):
     """
     zapier_webhook_url = models.URLField(
         blank=True,
-        default="https://hooks.zapier.com/hooks/catch/530937/ur7g2ql/",
+        default="https://EXAMPLE.COM/",
         help_text="Zapier webhook URL to send form submissions to. Leave blank to disable Zapier integration."
     )
     
