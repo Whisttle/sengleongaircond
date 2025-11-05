@@ -944,8 +944,9 @@ class HomePage(AbstractEmailForm):
                     # Log the error but don't fail the submission
                     print(f"Error sending email via Mailtrap: {str(e)}")
                 
-                # Render the thank you page
-                return self.render_landing_page(request, form_submission, *args, **kwargs)
+                # Redirect to thank you page
+                from django.shortcuts import redirect
+                return redirect('thank_you')
         else:
             form = self.get_form(page=self, user=request.user)
         

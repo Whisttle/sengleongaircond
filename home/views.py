@@ -210,3 +210,24 @@ def submit_contact_form(request):
             'success': False,
             'message': 'An error occurred while sending your message. Please try WhatsApp instead or contact us directly.'
         }, status=500)
+
+
+def thank_you_page(request):
+    """
+    Render the thank you page after successful form submission
+    """
+    from django.shortcuts import render
+    from .models import HomePage
+    
+    # Get the HomePage instance (there's only one with max_count=1)
+    try:
+        page = HomePage.objects.live().first()
+    except HomePage.DoesNotExist:
+        page = None
+    
+    # Render the thank you template with page context
+    context = {
+        'page': page,
+    }
+    
+    return render(request, 'home/home_page_landing.html', context)

@@ -17,6 +17,7 @@ urlpatterns = [
     path("search/", search_views.search, name="search"),
     path('', include(favicon_urls)),
     path("api/contact/submit/", home_views.submit_contact_form, name="submit_contact_form"),
+    path("thank-you/", home_views.thank_you_page, name="thank_you"),
 ]
 
 
