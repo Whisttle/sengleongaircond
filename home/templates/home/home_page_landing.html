@@ -200,8 +200,14 @@
             font-size: 20px;
         }
     </style>
+    {% if page.embed_head_code %}
+        {{ page.embed_head_code|safe }}
+    {% endif %}
 </head>
 <body>
+    {% if page.embed_body_code %}
+        {{ page.embed_body_code|safe }}
+    {% endif %}
     <div class="thank-you-container">
         <div class="success-icon">
             <i class="fas fa-check"></i>
