@@ -1483,12 +1483,50 @@ header {
     }
 }
 
-/* whatsapp  */
-
-.whatsapp-float {
+/* Floating Buttons Container */
+.floating-buttons {
     position: fixed;
     bottom: 40px;
     right: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 1000;
+}
+
+/* Shopee Floating Button */
+.shopee-float {
+    background: linear-gradient(135deg, #EE4D2D 0%, #FF6633 100%);
+    color: white;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 2px 2px 10px rgba(238, 77, 45, 0.4);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.shopee-float:hover {
+    transform: scale(1.1);
+    background: linear-gradient(135deg, #FF6633 0%, #EE4D2D 100%);
+    box-shadow: 4px 4px 15px rgba(238, 77, 45, 0.5);
+}
+
+.shopee-float .shopee-icon {
+    width: 40px;
+    height: 40px;
+    fill: white;
+}
+
+.shopee-float .shopee-text {
+    display: none;
+}
+
+/* WhatsApp Floating Button */
+.whatsapp-float {
     background-color: #25D366;
     color: white;
     width: 80px;
@@ -1499,26 +1537,44 @@ header {
     justify-content: center;
     font-size: 30px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
     transition: all 0.3s ease;
     text-decoration: none;
 }
 
 .whatsapp-float:hover {
-    transform: scale(1.2);
+    transform: scale(1.1);
     background-color: #20ba5a;
 }
-.whatsapp-float i{
+
+.whatsapp-float i {
     font-size: 36px;
     color: white;
 }
 
 @media (max-width: 768px) {
-    .whatsapp-float {
+    .floating-buttons {
         bottom: 20px;
         right: 20px;
+        gap: 10px;
+    }
+    
+    .shopee-float {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .shopee-float .shopee-icon {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .whatsapp-float {
         width: 50px;
         height: 50px;
         font-size: 25px;
+    }
+    
+    .whatsapp-float i {
+        font-size: 28px;
     }
 }

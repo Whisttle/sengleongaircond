@@ -1781,8 +1781,22 @@
             <p>&copy; 2025 {{ page.company_name }}. All Rights Reserved.</p>
         </div>
     </footer>
-    <a href="https://wa.me/{{ page.whatsapp_number }}?text={{ page.whatsapp_message|urlencode }}" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
-        <i class="fab fa-whatsapp"></i>
-    </a>
+    <!-- Floating Action Buttons -->
+    <div class="floating-buttons">
+        {% if page.shopee_button_enabled and page.shopee_url %}
+        <a href="{{ page.shopee_url }}" class="shopee-float" target="_blank" rel="noopener noreferrer" aria-label="Visit our Shopee Store">
+            <svg class="shopee-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C9.243 2 7 4.243 7 7h2c0-1.654 1.346-3 3-3s3 1.346 3 3h2c0-2.757-2.243-5-5-5z"/>
+                <path d="M19 7H5c-1.103 0-2 .897-2 2v11c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V9c0-1.103-.897-2-2-2zm-7 10c-2.757 0-5-2.243-5-5h2c0 1.654 1.346 3 3 3s3-1.346 3-3h2c0 2.757-2.243 5-5 5z"/>
+            </svg>
+            {% if page.shopee_button_text %}
+            <span class="shopee-text">{{ page.shopee_button_text }}</span>
+            {% endif %}
+        </a>
+        {% endif %}
+        <a href="https://wa.me/{{ page.whatsapp_number }}?text={{ page.whatsapp_message|urlencode }}" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+    </div>
     </body>
 </html>
